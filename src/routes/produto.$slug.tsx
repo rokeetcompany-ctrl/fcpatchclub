@@ -1,10 +1,14 @@
 import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-router";
 import { GameLayout } from "@/components/game/Layout";
-import { findProduct, RARITY_META, type Variant } from "@/data/products";
+import { findProduct, RARITY_META, type Product, type Variant } from "@/data/products";
 import { Jersey } from "@/components/game/Jersey";
-import { useState } from "react";
-import { ArrowLeft, Heart, ShoppingCart, Zap, Truck, ShieldCheck, Award, Tag, ChevronRight, Star } from "lucide-react";
+import { useMemo, useState } from "react";
+import {
+  ArrowLeft, Heart, ShoppingCart, Zap, Truck, ShieldCheck, Award, Tag,
+  ChevronRight, Star, Sparkles, Shirt, Trophy, History, Flame,
+} from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/produto/$slug")({
   loader: ({ params }) => {
@@ -53,21 +57,58 @@ function StatBar({ label, value }: { label: string; value: number }) {
   );
 }
 
+type FabricKey = "torcedor" | "jogador" | "retro";
+
+const FABRICS: Record<FabricKey, { label: string; sub: string; surcharge: number }> = {
+  torcedor: { label: "TORCEDOR · DRY-FIT", sub: "Tecido leve respirável", surcharge: 0 },
+  jogador:  { label: "JOGADOR · PRO MATCH", sub: "Versão idêntica à de campo", surcharge: 80 },
+  retro:    { label: "RETRÔ · ALGODÃO 1990", sub: "Reedição fiel ao original", surcharge: 0 },
+};
+
 function ProductPage() {
-  const { product: p } = Route.useLoaderData();
+  const { product: p } = Route.useLoaderData() as { product: Product };
   const meta = RARITY_META[p.rarity];
   const nav = useNavigate();
   const { add } = useCart();
   const [variant, setVariant] = useState<Variant>(p.variants[0]);
   const [size, setSize] = useState<string>("M");
   const [fav, setFav] = useState(false);
+
+  const isLegendary = p.type === "legendary";
+  const fabricOptions: FabricKey[] = isLegendary ? ["retro"] : ["torcedor", "jogador"];
+  const [fabric, setFabric] = useState<FabricKey>(fabricOptions[0]);
+
   const sizes = ["P", "M", "G", "GG", "XGG"];
-  const installments = (p.price / 12);
+  const finalPrice = p.price + (FABRICS[fabric]?.surcharge ?? 0);
+  const installments = finalPrice / 12;
+
+  // Gallery: 4 angles built from the Jersey component
+  const gallery = useMemo(() => ([
+    { key: "front", label: "FRENTE", number: p.year % 100, useVariant: variant },
+    { key: "back",  label: "COSTAS", number: 10,           useVariant: variant },
+    { key: "alt",   label: p.variants.length > 1 ? "II" : "DETALHE", number: p.year % 100, useVariant: (p.variants[1] ?? variant) },
+    { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant },
+  ]), [p, variant]);
+  const [shotIdx, setShotIdx] = useState(0);
+  const shot = gallery[shotIdx];
 
   const handleAdd = (buyNow = false) => {
     add(p.id, variant, 1);
+    toast.success(`${p.team} (${size} · ${variant === "home" ? "I" : "II"}) no carrinho!`);
     if (buyNow) nav({ to: "/carrinho" });
   };
+
+  const reasons = isLegendary ? [
+    { icon: History, title: "Pedaço da história",     text: `Reedição fiel da camisa ${p.year}. Cada detalhe inspirado no original.` },
+    { icon: Trophy,  title: "Edição colecionador",     text: "Tiragem limitada, numerada e com selo de autenticidade Patch Club." },
+    { icon: Shirt,   title: "Algodão premium",         text: "Toque vintage, costuras reforçadas e gola ribana fiel à era." },
+    { icon: Award,   title: "100% original",           text: "Embalagem premium com card de coleção e card de raridade físico." },
+  ] : [
+    { icon: Flame,   title: "Drop oficial Copa 2026",  text: `Hype na medida certa: a camisa que ${p.team} vai vestir nos jogos.` },
+    { icon: Shirt,   title: "Tecnologia Dry-Fit",      text: "Tecido respirável que suporta 90 minutos de vibração no estádio ou no sofá." },
+    { icon: Trophy,  title: `OVR ${p.ovr} · ${meta.label}`, text: "Card raro no nosso sistema. Quanto maior o OVR, mais valor de coleção." },
+    { icon: ShieldCheck, title: "Garantia 30 dias",    text: "Não amou? Devolução grátis. Pagamento 100% seguro e antifraude." },
+  ];
 
   return (
     <GameLayout>
@@ -77,28 +118,56 @@ function ProductPage() {
         </Link>
 
         <div className="grid gap-8 md:grid-cols-2">
-          {/* Image / Card */}
-          <div className="relative overflow-hidden rounded-2xl border bg-card/70 backdrop-blur"
-               style={{ boxShadow: `inset 0 0 0 1px ${meta.color}55, 0 0 50px ${meta.color}25` }}>
-            <div className="absolute inset-0 bg-grid opacity-15" />
-            <div className="absolute left-3 top-3 z-10 rounded-md border px-2 py-1 font-display text-xs font-black"
-                 style={{ borderColor: meta.color, color: meta.color, background: "rgba(0,0,0,0.55)" }}>
-              {p.ovr} OVR
+          {/* GALLERY */}
+          <div className="space-y-3">
+            <div className="relative overflow-hidden rounded-2xl border bg-card/70 backdrop-blur"
+                 style={{ boxShadow: `inset 0 0 0 1px ${meta.color}55, 0 0 50px ${meta.color}25` }}>
+              <div className="absolute inset-0 bg-grid opacity-15" />
+              <div className="absolute left-3 top-3 z-10 rounded-md border px-2 py-1 font-display text-xs font-black"
+                   style={{ borderColor: meta.color, color: meta.color, background: "rgba(0,0,0,0.55)" }}>
+                {p.ovr} OVR
+              </div>
+              <div className="absolute right-3 top-3 z-10 rounded-md px-2 py-1 font-tactical text-[10px] font-bold tracking-widest"
+                   style={{ background: `${meta.color}22`, color: meta.color, border: `1px solid ${meta.color}55` }}>
+                {meta.label}
+              </div>
+              <div className="absolute bottom-3 left-3 z-10 rounded-md bg-background/60 px-2 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest text-muted-foreground backdrop-blur">
+                {shot.label}
+              </div>
+              <div className="relative aspect-square">
+                <Jersey
+                  key={shot.key + shot.useVariant}
+                  primary={p.primary} secondary={p.secondary} accent={p.accent}
+                  variant={shot.useVariant} number={shot.number}
+                  className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
+                />
+              </div>
             </div>
-            <div className="absolute right-3 top-3 z-10 rounded-md px-2 py-1 font-tactical text-[10px] font-bold tracking-widest"
-                 style={{ background: `${meta.color}22`, color: meta.color, border: `1px solid ${meta.color}55` }}>
-              {meta.label}
-            </div>
-            <div className="relative aspect-square">
-              <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent} variant={variant} number={p.year % 100}
-                      className="absolute inset-0 m-auto h-[85%] w-auto drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]" />
+
+            {/* THUMBNAILS */}
+            <div className="grid grid-cols-4 gap-2">
+              {gallery.map((g, i) => (
+                <button key={g.key} onClick={() => setShotIdx(i)}
+                        className={`ps2-cursor relative aspect-square overflow-hidden rounded-lg border bg-card/60 transition ${i === shotIdx ? "border-primary shadow-neon" : "border-border hover:border-primary/50"}`}
+                        data-active={i === shotIdx}
+                        aria-label={`Ver ${g.label}`}>
+                  <div className="absolute inset-0 bg-grid opacity-20" />
+                  <div className="relative grid h-full place-items-center">
+                    <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent}
+                            variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                  </div>
+                  <span className="absolute inset-x-0 bottom-0 bg-background/70 py-0.5 text-center font-tactical text-[8px] font-bold uppercase tracking-widest">
+                    {g.label}
+                  </span>
+                </button>
+              ))}
             </div>
           </div>
 
-          {/* Details */}
+          {/* DETAILS */}
           <div>
             <div className="flex items-center gap-2 font-tactical text-[11px] font-bold uppercase tracking-[0.35em] text-muted-foreground">
-              <span>{p.flag}</span><span>{p.team}</span><span className="text-primary">·</span><span>{p.type === "legendary" ? `RETRÔ ${p.year}` : "DROP COPA 2026"}</span>
+              <span>{p.flag}</span><span>{p.team}</span><span className="text-primary">·</span><span>{isLegendary ? `RETRÔ ${p.year}` : "DROP COPA 2026"}</span>
             </div>
             <h1 className="mt-2 font-display text-3xl font-black uppercase tracking-tight md:text-4xl">{p.name}</h1>
 
@@ -109,11 +178,11 @@ function ProductPage() {
 
             <p className="mt-4 text-sm leading-relaxed text-muted-foreground md:text-base">{p.description}</p>
 
-            {/* Price block */}
+            {/* PRICE */}
             <div className="mt-6 rounded-xl border border-primary/30 bg-card/60 p-5">
               <div className="flex items-baseline gap-3">
-                <span className="font-display text-4xl font-black text-primary text-glow">R$ {fmt(p.price)}</span>
-                <span className="font-tactical text-xs text-muted-foreground line-through">R$ {fmt(p.price * 1.45)}</span>
+                <span className="font-display text-4xl font-black text-primary text-glow">R$ {fmt(finalPrice)}</span>
+                <span className="font-tactical text-xs text-muted-foreground line-through">R$ {fmt(finalPrice * 1.45)}</span>
                 <span className="rounded-md bg-destructive/20 px-2 py-0.5 font-tactical text-[10px] font-black text-destructive">-31%</span>
               </div>
               <p className="mt-1 font-tactical text-[11px] uppercase tracking-widest text-muted-foreground">
@@ -126,7 +195,7 @@ function ProductPage() {
               </div>
             </div>
 
-            {/* Variant selector */}
+            {/* VARIANT */}
             {p.variants.length > 1 && (
               <div className="mt-6">
                 <p className="mb-2 font-tactical text-xs font-bold uppercase tracking-widest text-muted-foreground">Modelo</p>
@@ -135,7 +204,8 @@ function ProductPage() {
                     const sel = variant === v;
                     return (
                       <button key={v} onClick={() => setVariant(v)}
-                              className={`group flex items-center gap-3 rounded-lg border p-3 text-left transition ${sel ? "border-primary bg-primary/10 shadow-neon" : "border-border bg-card/40 hover:border-primary/50"}`}>
+                              className={`ps2-cursor group flex items-center gap-3 rounded-lg border p-3 text-left transition ${sel ? "border-primary bg-primary/10 shadow-neon" : "border-border bg-card/40 hover:border-primary/50"}`}
+                              data-active={sel}>
                         <div className="grid h-14 w-14 shrink-0 place-items-center rounded bg-background/50">
                           <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent} variant={v} number={p.year % 100} className="h-12 w-12" />
                         </div>
@@ -150,20 +220,47 @@ function ProductPage() {
               </div>
             )}
 
-            {/* Size selector */}
+            {/* FABRIC */}
             <div className="mt-5">
-              <p className="mb-2 font-tactical text-xs font-bold uppercase tracking-widest text-muted-foreground">Tamanho</p>
+              <p className="mb-2 font-tactical text-xs font-bold uppercase tracking-widest text-muted-foreground">Tecido</p>
+              <div className="grid gap-2 sm:grid-cols-2">
+                {fabricOptions.map(f => {
+                  const cfg = FABRICS[f]; const sel = fabric === f;
+                  return (
+                    <button key={f} onClick={() => setFabric(f)}
+                            className={`ps2-cursor flex items-center justify-between rounded-lg border p-3 text-left transition ${sel ? "border-primary bg-primary/10 shadow-neon" : "border-border bg-card/40 hover:border-primary/50"}`}
+                            data-active={sel}>
+                      <div>
+                        <p className={`font-display text-xs font-black uppercase tracking-widest ${sel ? "text-primary" : ""}`}>{cfg.label}</p>
+                        <p className="font-tactical text-[10px] uppercase tracking-widest text-muted-foreground">{cfg.sub}</p>
+                      </div>
+                      <span className="font-display text-xs font-black text-primary">
+                        {cfg.surcharge ? `+R$ ${fmt(cfg.surcharge)}` : "INCLUSO"}
+                      </span>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* SIZE */}
+            <div className="mt-5">
+              <div className="mb-2 flex items-center justify-between">
+                <p className="font-tactical text-xs font-bold uppercase tracking-widest text-muted-foreground">Tamanho</p>
+                <button className="font-tactical text-[10px] uppercase tracking-widest text-primary hover:underline">Guia de medidas</button>
+              </div>
               <div className="flex flex-wrap gap-2">
                 {sizes.map(s => (
                   <button key={s} onClick={() => setSize(s)}
-                          className={`min-w-[48px] rounded-md border px-4 py-2 font-display text-sm font-black ${size === s ? "border-primary bg-primary text-primary-foreground shadow-neon" : "border-border bg-card hover:border-primary/50"}`}>
+                          className={`ps2-cursor min-w-[48px] rounded-md border px-4 py-2 font-display text-sm font-black transition ${size === s ? "border-primary bg-primary text-primary-foreground shadow-neon" : "border-border bg-card hover:border-primary/50"}`}
+                          data-active={size === s}>
                     {s}
                   </button>
                 ))}
               </div>
             </div>
 
-            {/* Stats card */}
+            {/* STATS */}
             <div className="mt-6 rounded-xl border bg-card/60 p-4" style={{ borderColor: `${meta.color}55` }}>
               <div className="mb-3 flex items-center justify-between">
                 <p className="font-display text-sm font-black uppercase tracking-widest" style={{ color: meta.color }}>FORÇA DO CARD</p>
@@ -177,7 +274,7 @@ function ProductPage() {
               </div>
             </div>
 
-            {/* CTAs */}
+            {/* CTA — sticky on mobile */}
             <div className="mt-6 flex flex-col gap-3 sm:flex-row">
               <button onClick={() => handleAdd(true)}
                       className="flex flex-1 items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 font-display text-sm font-black uppercase tracking-widest text-primary-foreground shadow-neon transition hover:scale-[1.02]">
@@ -193,7 +290,6 @@ function ProductPage() {
               </button>
             </div>
 
-            {/* Trust */}
             <div className="mt-5 flex flex-wrap gap-3 font-tactical text-[11px] uppercase tracking-widest text-muted-foreground">
               <span className="inline-flex items-center gap-1"><Award className="h-3.5 w-3.5 text-primary" /> 100% Original</span>
               <span className="inline-flex items-center gap-1"><Truck className="h-3.5 w-3.5 text-primary" /> Entrega 7-15 dias</span>
@@ -201,6 +297,36 @@ function ProductPage() {
             </div>
           </div>
         </div>
+
+        {/* WHY THIS JERSEY */}
+        <section className="mt-12 rounded-2xl border bg-card/40 p-6 backdrop-blur md:p-8"
+                 style={{ borderColor: `${meta.color}33` }}>
+          <div className="mb-5 flex items-center gap-2">
+            <Sparkles className="h-5 w-5" style={{ color: meta.color }} />
+            <h2 className="font-display text-xl font-black uppercase tracking-tight md:text-2xl">
+              POR QUE ESSA CAMISA?
+            </h2>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {reasons.map(r => (
+              <div key={r.title} className="flex gap-3 rounded-xl border border-border bg-background/40 p-4">
+                <div className="grid h-10 w-10 shrink-0 place-items-center rounded-md border"
+                     style={{ borderColor: meta.color, color: meta.color, background: `${meta.color}15` }}>
+                  <r.icon className="h-5 w-5" />
+                </div>
+                <div>
+                  <p className="font-display text-sm font-black uppercase tracking-wide">{r.title}</p>
+                  <p className="mt-0.5 text-sm text-muted-foreground">{r.text}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          <button onClick={() => handleAdd(false)}
+                  className="mt-6 inline-flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-3 font-display text-sm font-black uppercase tracking-widest text-primary-foreground shadow-neon hover:scale-[1.01] sm:w-auto">
+            <ShoppingCart className="h-4 w-4" /> ADICIONAR AO CARRINHO · R$ {fmt(finalPrice)}
+          </button>
+        </section>
       </div>
     </GameLayout>
   );
