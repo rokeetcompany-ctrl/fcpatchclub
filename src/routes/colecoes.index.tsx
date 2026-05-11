@@ -3,6 +3,8 @@ import { GameLayout, PageHero } from "@/components/game/Layout";
 import { CONTINENTS, PRODUCTS, legendaryProducts } from "@/data/products";
 import { JerseyCard } from "@/components/game/JerseyCard";
 import { ChevronRight, Trophy } from "lucide-react";
+import { useState } from "react";
+import { playCursorTick } from "@/lib/stadium-audio";
 
 export const Route = createFileRoute("/colecoes/")({
   head: () => ({
@@ -13,22 +15,34 @@ export const Route = createFileRoute("/colecoes/")({
 
 function ColecoesIndex() {
   const legs = legendaryProducts();
+  const [hover, setHover] = useState<string | null>(null);
+
   return (
     <GameLayout>
       <PageHero
         kicker="EXPLORAR · ROAD TO 2026"
         title="Selecione seu Continente"
-        sub="Cada continente é um mapa. Cada camisa, uma missão. Escolha onde começar."
+        sub="Use o cursor neon como num menu de PS2: passe pelos continentes para ouvir o tick e escolha sua missão."
       />
       <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
         <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3">
           {CONTINENTS.map(c => {
             const count = PRODUCTS.filter(p => p.continent === c.id && p.type === "current").length;
+            const active = hover === c.id;
             return (
               <Link key={c.id} to="/colecoes/$continent" params={{ continent: c.id }}
-                    className="group relative overflow-hidden rounded-xl border border-border bg-card/70 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-neon">
+                    onMouseEnter={() => { if (hover !== c.id) playCursorTick(); setHover(c.id); }}
+                    onFocus={() => { if (hover !== c.id) playCursorTick(); setHover(c.id); }}
+                    onMouseLeave={() => setHover(h => (h === c.id ? null : h))}
+                    data-active={active}
+                    className="ps2-cursor group relative overflow-hidden rounded-xl border border-border bg-card/70 p-6 backdrop-blur transition hover:-translate-y-1 hover:border-primary/60 hover:shadow-neon">
                 <div className="absolute inset-0 bg-grid opacity-10 transition group-hover:opacity-25" />
-                <div className="relative flex items-center justify-between">
+                {/* PS2 selector chevron */}
+                <div className="pointer-events-none absolute -left-1 top-1/2 -translate-y-1/2 opacity-0 transition group-hover:left-2 group-hover:opacity-100"
+                     aria-hidden="true">
+                  <ChevronRight className="h-7 w-7 animate-ps2-blink text-primary text-glow" />
+                </div>
+                <div className="relative flex items-center justify-between pl-4">
                   <div>
                     <span className="text-5xl">{c.emoji}</span>
                     <h3 className="mt-3 font-display text-xl font-black uppercase tracking-tight">{c.name}</h3>

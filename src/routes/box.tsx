@@ -3,6 +3,9 @@ import { GameLayout, PageHero } from "@/components/game/Layout";
 import { useState } from "react";
 import { Box, Sparkles, Zap } from "lucide-react";
 import boxImg from "@/assets/mystery-box.png";
+import { BoxOpen } from "@/components/game/BoxOpen";
+import { useCart } from "@/lib/cart";
+import { toast } from "sonner";
 
 export const Route = createFileRoute("/box")({
   head: () => ({ meta: [{ title: "Box Surpresa · PATCH CLUB" }, { name: "description", content: "Abra boxes e descubra camisas raras." }] }),
@@ -10,26 +13,37 @@ export const Route = createFileRoute("/box")({
 });
 
 const BOXES = [
-  { id: "normal", name: "BOX NORMAL", price: 229, color: "var(--silver)", chances: { Prata: 60, Ouro: 35, Épico: 5, Lendário: 0 } },
-  { id: "epico", name: "BOX ÉPICO", price: 299, color: "var(--epic)", chances: { Prata: 20, Ouro: 50, Épico: 25, Lendário: 5 } },
-  { id: "lendario", name: "BOX LENDÁRIO", price: 349, color: "var(--gold)", chances: { Prata: 0, Ouro: 30, Épico: 50, Lendário: 20 } },
+  { id: "normal",   name: "BOX NORMAL",   price: 229, color: "var(--silver)", chances: { Prata: 60, Ouro: 35, Épico: 5,  Lendário: 0 } },
+  { id: "epico",    name: "BOX ÉPICO",    price: 299, color: "var(--epic)",   chances: { Prata: 20, Ouro: 50, Épico: 25, Lendário: 5 } },
+  { id: "lendario", name: "BOX LENDÁRIO", price: 349, color: "var(--gold)",   chances: { Prata: 0,  Ouro: 30, Épico: 50, Lendário: 20 } },
 ];
 
 function BoxPage() {
   const [sel, setSel] = useState("epico");
+  const [opening, setOpening] = useState(false);
+  const [openSeed, setOpenSeed] = useState(0);
+  const { add } = useCart();
   const box = BOXES.find(b => b.id === sel)!;
+
+  const open = () => { setOpenSeed(s => s + 1); setOpening(true); };
+
   return (
     <GameLayout>
       <PageHero kicker="LOOT BOX · ROAD TO 2026" title="BOX SURPRESA" sub="Compre uma box e receba uma camisa real entregue em casa. Quanto maior a box, maiores as chances de raridade." />
       <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
         <div className="grid gap-6 md:grid-cols-[1fr_1fr] md:items-center">
           <div className="grid place-items-center">
-            <img src={boxImg} alt="Box" className="h-64 w-auto animate-float-y drop-shadow-[0_0_60px_oklch(0.62_0.27_305_/_0.7)] md:h-80" />
+            <div className="relative">
+              <div className="absolute -inset-10 rounded-full opacity-60 blur-3xl"
+                   style={{ background: `radial-gradient(circle, ${box.color}55, transparent 70%)` }} />
+              <img src={boxImg} alt="Box" className="relative h-64 w-auto animate-float-y drop-shadow-[0_0_60px_oklch(0.62_0.27_305_/_0.7)] md:h-80" />
+            </div>
           </div>
           <div className="space-y-3">
             {BOXES.map(b => (
               <button key={b.id} onClick={() => setSel(b.id)}
-                      className={`flex w-full items-center justify-between rounded-xl border p-4 transition ${sel === b.id ? "shadow-neon" : "hover:border-primary/50"}`}
+                      className={`ps2-cursor flex w-full items-center justify-between rounded-xl border p-4 transition ${sel === b.id ? "shadow-neon" : "hover:border-primary/50"}`}
+                      data-active={sel === b.id}
                       style={{ borderColor: sel === b.id ? `${b.color}` : undefined, background: sel === b.id ? `${b.color}11` : undefined }}>
                 <div className="flex items-center gap-3 text-left">
                   <Box className="h-6 w-6" style={{ color: b.color }} />
@@ -51,19 +65,36 @@ function BoxPage() {
                       <span>{k}</span><span className="text-foreground font-bold">{v}%</span>
                     </div>
                     <div className="h-1.5 overflow-hidden rounded-full bg-muted">
-                      <div className="h-full bg-primary shadow-neon" style={{ width: `${v}%` }} />
+                      <div className="h-full bg-primary shadow-neon transition-all" style={{ width: `${v}%` }} />
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            <button className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 font-display text-sm font-black uppercase tracking-widest text-primary-foreground shadow-neon hover:scale-[1.02]">
+            <button onClick={open}
+                    className="flex w-full items-center justify-center gap-2 rounded-md bg-primary px-6 py-4 font-display text-sm font-black uppercase tracking-widest text-primary-foreground shadow-neon transition hover:scale-[1.02] active:scale-[0.99]">
               <Sparkles className="h-4 w-4" /> ABRIR {box.name} <Zap className="h-4 w-4" />
             </button>
+            <p className="text-center font-tactical text-[10px] uppercase tracking-widest text-muted-foreground">
+              Drop ilustrativo · A camisa real é enviada após confirmação do pagamento
+            </p>
           </div>
         </div>
       </section>
+
+      <BoxOpen
+        key={openSeed}
+        open={opening}
+        boxName={box.name}
+        chances={box.chances}
+        onClose={() => setOpening(false)}
+        onAddToCart={(p) => {
+          add(p.id, p.variants[0], 1);
+          toast.success(`${p.team} adicionada ao carrinho!`);
+          setOpening(false);
+        }}
+      />
     </GameLayout>
   );
 }

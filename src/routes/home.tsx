@@ -1,11 +1,11 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { GameLayout } from "@/components/game/Layout";
 import { JerseyCard } from "@/components/game/JerseyCard";
-import { CONTINENTS, PRODUCTS, legendaryProducts } from "@/data/products";
-import { Box, Compass, Flame, Sparkles, Target, Trophy, ChevronRight } from "lucide-react";
+import { CONTINENTS, PRODUCTS, RARITY_META, legendaryProducts, type Continent, type Rarity } from "@/data/products";
+import { Box, Flame, Sparkles, Target, Trophy, ChevronRight, Search, X, SlidersHorizontal } from "lucide-react";
 import heroImg from "@/assets/hero-stadium.jpg";
 import boxImg from "@/assets/mystery-box.png";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 export const Route = createFileRoute("/home")({
   head: () => ({
@@ -35,9 +35,46 @@ function Countdown() {
   return <div className="flex gap-2">{cell(d, "DIAS")}{cell(h, "HRS")}{cell(m, "MIN")}{cell(s, "SEG")}</div>;
 }
 
+const RARITIES: { id: Rarity | "all"; label: string }[] = [
+  { id: "all", label: "TODAS" },
+  { id: "lendario", label: "LENDÁRIO" },
+  { id: "epico", label: "ÉPICO" },
+  { id: "ouro", label: "OURO" },
+  { id: "prata", label: "PRATA" },
+];
+
+const PRICE_BUCKETS = [
+  { id: "all",  label: "QUALQUER",   min: 0,    max: Infinity },
+  { id: "low",  label: "ATÉ R$ 229", min: 0,    max: 229 },
+  { id: "mid",  label: "R$ 230-299", min: 230,  max: 299 },
+  { id: "high", label: "R$ 300+",    min: 300,  max: Infinity },
+] as const;
+
 function HomeHub() {
-  const tier1 = PRODUCTS.filter(p => p.type === "current").slice(0, 8);
-  const legs = legendaryProducts().slice(0, 6);
+  const [q, setQ] = useState("");
+  const [continent, setContinent] = useState<Continent | "all">("all");
+  const [rarity, setRarity] = useState<Rarity | "all">("all");
+  const [bucket, setBucket] = useState<typeof PRICE_BUCKETS[number]["id"]>("all");
+  const [showFilters, setShowFilters] = useState(false);
+
+  const filtered = useMemo(() => {
+    const ql = q.trim().toLowerCase();
+    const pb = PRICE_BUCKETS.find(b => b.id === bucket)!;
+    return PRODUCTS.filter(p => {
+      if (ql && !`${p.team} ${p.name} ${p.year}`.toLowerCase().includes(ql)) return false;
+      if (continent !== "all" && p.continent !== continent) return false;
+      if (rarity !== "all" && p.rarity !== rarity) return false;
+      if (p.price < pb.min || p.price > pb.max) return false;
+      return true;
+    });
+  }, [q, continent, rarity, bucket]);
+
+  const tier1 = filtered.filter(p => p.type === "current").slice(0, 12);
+  const legs = filtered.filter(p => p.type === "legendary").slice(0, 12);
+  const noFilter = q === "" && continent === "all" && rarity === "all" && bucket === "all";
+  const totalLeg = legendaryProducts().length;
+
+  const clearAll = () => { setQ(""); setContinent("all"); setRarity("all"); setBucket("all"); };
 
   return (
     <GameLayout>
@@ -81,62 +118,167 @@ function HomeHub() {
         </div>
       </section>
 
-      {/* CONTINENTS */}
-      <section className="mx-auto max-w-7xl px-4 py-10 md:px-6">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-primary">EXPLORAR</p>
-            <h2 className="font-display text-2xl font-black uppercase tracking-tight md:text-3xl">SELEÇÕES POR CONTINENTE</h2>
+      {/* SEARCH + FILTERS — sticky on mobile */}
+      <section className="sticky top-0 z-30 border-b border-border/60 bg-background/85 backdrop-blur md:top-[68px]">
+        <div className="mx-auto max-w-7xl px-4 py-3 md:px-6">
+          <div className="flex items-center gap-2">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+              <input
+                value={q} onChange={e => setQ(e.target.value)}
+                placeholder="Buscar seleção, time, ano…"
+                className="h-11 w-full rounded-md border border-border bg-card/60 pl-9 pr-9 font-tactical text-sm uppercase tracking-wide placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+              />
+              {q && (
+                <button onClick={() => setQ("")} aria-label="Limpar"
+                        className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-muted-foreground hover:text-foreground">
+                  <X className="h-4 w-4" />
+                </button>
+              )}
+            </div>
+            <button onClick={() => setShowFilters(v => !v)}
+                    className={`ps2-cursor inline-flex h-11 items-center gap-1.5 rounded-md border px-3 font-tactical text-xs font-bold uppercase tracking-widest transition md:hidden ${showFilters ? "border-primary bg-primary/10 text-primary" : "border-border text-muted-foreground"}`}
+                    data-active={showFilters}>
+              <SlidersHorizontal className="h-4 w-4" /> Filtros
+            </button>
           </div>
-          <Link to="/colecoes" className="hidden items-center gap-1 font-tactical text-xs font-bold uppercase tracking-widest text-primary hover:underline md:inline-flex">
-            VER TUDO <ChevronRight className="h-4 w-4" />
-          </Link>
-        </div>
-        <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
-          {CONTINENTS.map(c => (
-            <Link key={c.id} to="/colecoes/$continent" params={{ continent: c.id }}
-                  className="group relative overflow-hidden rounded-lg border border-border bg-card/60 p-4 transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-neon">
-              <div className="absolute inset-0 bg-grid opacity-10 transition group-hover:opacity-30" />
-              <div className="relative">
-                <span className="text-3xl">{c.emoji}</span>
-                <p className="mt-2 font-display text-sm font-black uppercase tracking-wide">{c.name}</p>
-                <p className="mt-0.5 font-tactical text-[10px] uppercase tracking-widest text-muted-foreground">{c.desc}</p>
+
+          <div className={`${showFilters ? "block" : "hidden"} md:block`}>
+            <div className="mt-3 grid gap-2 md:grid-cols-3">
+              {/* Continent chips */}
+              <div className="flex flex-wrap gap-1.5">
+                <button onClick={() => setContinent("all")}
+                        data-active={continent === "all"}
+                        className={`ps2-cursor rounded-full border px-3 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest transition ${continent === "all" ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"}`}>
+                  🌐 Todos
+                </button>
+                {CONTINENTS.map(c => (
+                  <button key={c.id} onClick={() => setContinent(c.id)}
+                          data-active={continent === c.id}
+                          className={`ps2-cursor rounded-full border px-3 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest transition ${continent === c.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"}`}>
+                    <span className="mr-1">{c.emoji}</span>{c.name}
+                  </button>
+                ))}
               </div>
-            </Link>
-          ))}
+
+              {/* Rarity chips */}
+              <div className="flex flex-wrap gap-1.5">
+                {RARITIES.map(r => {
+                  const sel = rarity === r.id;
+                  const color = r.id === "all" ? "var(--primary)" : RARITY_META[r.id as Rarity].color;
+                  return (
+                    <button key={r.id} onClick={() => setRarity(r.id)}
+                            data-active={sel}
+                            className={`ps2-cursor rounded-full border px-3 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest transition ${sel ? "shadow-neon" : "hover:opacity-90"}`}
+                            style={{
+                              borderColor: sel ? color : "var(--border)",
+                              background: sel ? `${color}22` : "transparent",
+                              color: sel ? color : "var(--muted-foreground)",
+                            }}>
+                      {r.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Price */}
+              <div className="flex flex-wrap gap-1.5">
+                {PRICE_BUCKETS.map(b => (
+                  <button key={b.id} onClick={() => setBucket(b.id)}
+                          data-active={bucket === b.id}
+                          className={`ps2-cursor rounded-full border px-3 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest transition ${bucket === b.id ? "border-primary bg-primary text-primary-foreground" : "border-border bg-card/60 text-muted-foreground hover:border-primary/50"}`}>
+                    {b.label}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="mt-2 flex items-center justify-between font-tactical text-[10px] uppercase tracking-widest text-muted-foreground">
+              <span><span className="text-primary font-bold">{filtered.length}</span> camisas encontradas</span>
+              {!noFilter && (
+                <button onClick={clearAll} className="inline-flex items-center gap-1 text-primary hover:underline">
+                  <X className="h-3 w-3" /> Limpar filtros
+                </button>
+              )}
+            </div>
+          </div>
         </div>
       </section>
 
-      {/* TIER 1 — Hype Copa */}
-      <section className="mx-auto max-w-7xl px-4 pb-10 md:px-6">
+      {/* CONTINENTS */}
+      {noFilter && (
+        <section className="mx-auto max-w-7xl px-4 py-8 md:px-6">
+          <div className="mb-5 flex items-end justify-between">
+            <div>
+              <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-primary">EXPLORAR</p>
+              <h2 className="font-display text-2xl font-black uppercase tracking-tight md:text-3xl">SELEÇÕES POR CONTINENTE</h2>
+            </div>
+            <Link to="/colecoes" className="hidden items-center gap-1 font-tactical text-xs font-bold uppercase tracking-widest text-primary hover:underline md:inline-flex">
+              VER TUDO <ChevronRight className="h-4 w-4" />
+            </Link>
+          </div>
+          <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
+            {CONTINENTS.map(c => (
+              <button key={c.id} onClick={() => setContinent(c.id)}
+                      data-active={false}
+                      className="ps2-cursor group relative overflow-hidden rounded-lg border border-border bg-card/60 p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-neon">
+                <div className="absolute inset-0 bg-grid opacity-10 transition group-hover:opacity-30" />
+                <div className="relative">
+                  <span className="text-3xl">{c.emoji}</span>
+                  <p className="mt-2 font-display text-sm font-black uppercase tracking-wide">{c.name}</p>
+                  <p className="mt-0.5 font-tactical text-[10px] uppercase tracking-widest text-muted-foreground">{c.desc}</p>
+                </div>
+              </button>
+            ))}
+          </div>
+        </section>
+      )}
+
+      {/* RESULTS or DROPS */}
+      <section className="mx-auto max-w-7xl px-4 pb-8 pt-6 md:px-6 md:pt-10">
         <div className="mb-5 flex items-end justify-between">
           <div>
-            <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-primary">DROP DA COPA</p>
+            <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-primary">
+              {noFilter ? "DROP DA COPA" : "RESULTADOS"}
+            </p>
             <h2 className="font-display text-2xl font-black uppercase tracking-tight md:text-3xl">
-              <Flame className="mr-2 inline h-6 w-6 text-primary" />HYPE COPA 2026
+              <Flame className="mr-2 inline h-6 w-6 text-primary" />
+              {noFilter ? "HYPE COPA 2026" : `${filtered.filter(p => p.type === "current").length} CAMISAS ATUAIS`}
             </h2>
           </div>
           <Link to="/colecoes" className="font-tactical text-xs font-bold uppercase tracking-widest text-primary hover:underline">VER MAIS →</Link>
         </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
-          {tier1.map(p => <JerseyCard key={p.id} p={p} />)}
-        </div>
+        {tier1.length === 0 && legs.length === 0 ? (
+          <div className="rounded-xl border border-dashed border-border bg-card/40 p-12 text-center">
+            <p className="font-display text-base font-black uppercase tracking-widest text-muted-foreground">Nenhuma camisa encontrada</p>
+            <button onClick={clearAll} className="mt-3 inline-flex items-center gap-1 font-tactical text-xs uppercase tracking-widest text-primary hover:underline">
+              <X className="h-3 w-3" /> Limpar filtros
+            </button>
+          </div>
+        ) : (
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-4">
+            {tier1.map(p => <JerseyCard key={p.id} p={p} />)}
+          </div>
+        )}
       </section>
 
-      {/* TIER 2 — Lendárias */}
-      <section className="mx-auto max-w-7xl px-4 pb-10 md:px-6">
-        <div className="mb-5 flex items-end justify-between">
-          <div>
-            <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--gold)]">RETRÔ COLECIONADOR</p>
-            <h2 className="font-display text-2xl font-black uppercase tracking-tight md:text-3xl text-glow-gold">
-              <Trophy className="mr-2 inline h-6 w-6 text-[color:var(--gold)]" />CAMISAS LENDÁRIAS
-            </h2>
+      {/* LENDÁRIAS — only shown if matches */}
+      {legs.length > 0 && (
+        <section className="mx-auto max-w-7xl px-4 pb-10 md:px-6">
+          <div className="mb-5 flex items-end justify-between">
+            <div>
+              <p className="font-tactical text-[10px] font-bold uppercase tracking-[0.4em] text-[color:var(--gold)]">RETRÔ COLECIONADOR</p>
+              <h2 className="font-display text-2xl font-black uppercase tracking-tight md:text-3xl text-glow-gold">
+                <Trophy className="mr-2 inline h-6 w-6 text-[color:var(--gold)]" />
+                CAMISAS LENDÁRIAS {!noFilter && `· ${legs.length}/${totalLeg}`}
+              </h2>
+            </div>
           </div>
-        </div>
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
-          {legs.map(p => <JerseyCard key={p.id} p={p} />)}
-        </div>
-      </section>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
+            {legs.map(p => <JerseyCard key={p.id} p={p} />)}
+          </div>
+        </section>
+      )}
 
       {/* PROMO BOX */}
       <section className="mx-auto max-w-7xl px-4 pb-12 md:px-6">
