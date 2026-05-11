@@ -20,6 +20,7 @@ function LoadingScreen() {
   const [tipIdx, setTipIdx] = useState(0);
 
   useEffect(() => {
+    const stop = playStadiumBoot(2800);
     const start = Date.now();
     const dur = 2800;
     const t = setInterval(() => {
@@ -31,7 +32,7 @@ function LoadingScreen() {
       }
     }, 60);
     const tipT = setInterval(() => setTipIdx(i => (i + 1) % TIPS.length), 1100);
-    return () => { clearInterval(t); clearInterval(tipT); };
+    return () => { clearInterval(t); clearInterval(tipT); stop(); };
   }, [nav]);
 
   return (
