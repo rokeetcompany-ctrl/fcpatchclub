@@ -95,3 +95,103 @@ export function playStadiumBoot(durationMs = 2800) {
     } catch {}
   };
 }
+
+/** Box opening: tense build-up + reveal whoosh + rarity chime */
+export function playBoxOpen(rarity: "lendario" | "epico" | "ouro" | "prata" = "ouro") {
+  if (typeof window === "undefined") return;
+  const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+  if (!AC) return;
+  let ctx: AudioContext;
+  try { ctx = new AC(); } catch { return; }
+  const now = ctx.currentTime;
+
+  const master = ctx.createGain();
+  master.gain.value = 0.25;
+  master.connect(ctx.destination);
+
+  // Tense rumble — shake phase 0..2.0s
+  const sub = ctx.createOscillator();
+  sub.type = "sawtooth";
+  sub.frequency.setValueAtTime(55, now);
+  sub.frequency.exponentialRampToValueAtTime(140, now + 2.0);
+  const subFilter = ctx.createBiquadFilter();
+  subFilter.type = "lowpass";
+  subFilter.frequency.value = 320;
+  const subG = ctx.createGain();
+  subG.gain.setValueAtTime(0.0001, now);
+  subG.gain.exponentialRampToValueAtTime(0.45, now + 1.7);
+  subG.gain.exponentialRampToValueAtTime(0.001, now + 2.05);
+  sub.connect(subFilter).connect(subG).connect(master);
+  sub.start(now); sub.stop(now + 2.1);
+
+  // Crowd swell
+  const buf = ctx.createBuffer(1, ctx.sampleRate * 2.2, ctx.sampleRate);
+  const d = buf.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = (Math.random() * 2 - 1) * 0.6;
+  const noise = ctx.createBufferSource();
+  noise.buffer = buf;
+  const nF = ctx.createBiquadFilter();
+  nF.type = "bandpass"; nF.frequency.value = 900; nF.Q.value = 0.6;
+  const nG = ctx.createGain();
+  nG.gain.setValueAtTime(0.0001, now);
+  nG.gain.exponentialRampToValueAtTime(0.4, now + 1.9);
+  nG.gain.exponentialRampToValueAtTime(0.001, now + 2.2);
+  noise.connect(nF).connect(nG).connect(master);
+  noise.start(now); noise.stop(now + 2.2);
+
+  // Whoosh reveal at 2.0s
+  const whoosh = ctx.createOscillator();
+  whoosh.type = "sawtooth";
+  whoosh.frequency.setValueAtTime(800, now + 2.0);
+  whoosh.frequency.exponentialRampToValueAtTime(120, now + 2.35);
+  const wG = ctx.createGain();
+  wG.gain.setValueAtTime(0.0001, now + 2.0);
+  wG.gain.exponentialRampToValueAtTime(0.3, now + 2.05);
+  wG.gain.exponentialRampToValueAtTime(0.001, now + 2.4);
+  whoosh.connect(wG).connect(master);
+  whoosh.start(now + 2.0); whoosh.stop(now + 2.45);
+
+  // Rarity chord at 2.15s — more notes for higher rarity
+  const chordMap: Record<string, number[]> = {
+    prata:    [523.25, 659.25],
+    ouro:     [523.25, 659.25, 783.99],
+    epico:    [523.25, 659.25, 783.99, 987.77],
+    lendario: [392, 523.25, 659.25, 783.99, 987.77, 1318.51],
+  };
+  const chord = chordMap[rarity];
+  chord.forEach((f, idx) => {
+    const o = ctx.createOscillator();
+    o.type = "triangle";
+    o.frequency.value = f;
+    const g = ctx.createGain();
+    const t0 = now + 2.15 + idx * 0.04;
+    g.gain.setValueAtTime(0.0001, t0);
+    g.gain.exponentialRampToValueAtTime(0.18, t0 + 0.05);
+    g.gain.exponentialRampToValueAtTime(0.0001, t0 + 1.4);
+    o.connect(g).connect(master);
+    o.start(t0); o.stop(t0 + 1.5);
+  });
+
+  setTimeout(() => { try { ctx.close(); } catch {} }, 4200);
+}
+
+/** Soft UI tick used by PS2-style selection cursor */
+export function playCursorTick() {
+  if (typeof window === "undefined") return;
+  const AC = (window.AudioContext || (window as any).webkitAudioContext) as typeof AudioContext;
+  if (!AC) return;
+  let ctx: AudioContext;
+  try { ctx = new AC(); } catch { return; }
+  const now = ctx.currentTime;
+  const o = ctx.createOscillator();
+  o.type = "square";
+  o.frequency.setValueAtTime(880, now);
+  o.frequency.exponentialRampToValueAtTime(1320, now + 0.05);
+  const g = ctx.createGain();
+  g.gain.setValueAtTime(0.0001, now);
+  g.gain.exponentialRampToValueAtTime(0.06, now + 0.005);
+  g.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+  o.connect(g).connect(ctx.destination);
+  o.start(now); o.stop(now + 0.12);
+  setTimeout(() => { try { ctx.close(); } catch {} }, 200);
+}

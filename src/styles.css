@@ -121,12 +121,54 @@
 @keyframes flicker { 0%,100%{opacity:1} 92%{opacity:1} 94%{opacity:.55} 96%{opacity:1} 98%{opacity:.7} }
 @keyframes shine { 0%{ background-position: -200% 0;} 100%{ background-position: 200% 0;} }
 @keyframes loading-bar { 0%{width:0;} 100%{width:100%;} }
+@keyframes box-shake {
+  0%,100% { transform: translate(0,0) rotate(0); }
+  10% { transform: translate(-6px,-2px) rotate(-3deg); }
+  20% { transform: translate(6px,2px) rotate(3deg); }
+  30% { transform: translate(-8px,3px) rotate(-4deg); }
+  45% { transform: translate(7px,-3px) rotate(4deg); }
+  60% { transform: translate(-5px,-4px) rotate(-2deg); }
+  75% { transform: translate(5px,4px) rotate(2deg); }
+  90% { transform: translate(-2px,1px) rotate(-1deg); }
+}
+@keyframes box-burst {
+  0% { transform: scale(0.2); opacity: 0; filter: blur(8px); }
+  60% { transform: scale(1.15); opacity: 1; filter: blur(0); }
+  100% { transform: scale(1); opacity: 1; }
+}
+@keyframes confetti {
+  0% { transform: translate(-50%, -50%) translate(var(--tx,0), var(--ty,0)) scale(0); opacity: 1; }
+  100% { transform: translate(-50%, -50%) translate(calc(var(--tx,0) * 8), calc(var(--ty,0) * 8 + 200px)) scale(1) rotate(720deg); opacity: 0; }
+}
+@keyframes ray-spin { from { transform: rotate(0); } to { transform: rotate(360deg); } }
+@keyframes ps2-blink { 0%,100% { opacity: 1; } 50% { opacity: 0.25; } }
 
 .animate-pulse-neon { animation: pulse-neon 2.4s ease-in-out infinite; }
 .animate-float-y { animation: float-y 4s ease-in-out infinite; }
 .animate-scan { animation: scan-line 3s linear infinite; }
 .animate-flicker { animation: flicker 4s infinite; }
 .animate-loading-bar { animation: loading-bar 2.6s ease-out forwards; }
+.animate-box-shake { animation: box-shake 0.45s ease-in-out infinite; }
+.animate-box-burst { animation: box-burst 0.7s cubic-bezier(.2,.9,.2,1.2) forwards; }
+.animate-ray-spin { animation: ray-spin 12s linear infinite; }
+.animate-ps2-blink { animation: ps2-blink 0.8s ease-in-out infinite; }
+
+/* PS2-style selection cursor — corner brackets */
+.ps2-cursor { position: relative; }
+.ps2-cursor::before, .ps2-cursor::after {
+  content: ""; position: absolute; pointer-events: none;
+  width: 18px; height: 18px;
+  border: 2px solid var(--primary);
+  box-shadow: 0 0 12px var(--primary), inset 0 0 6px var(--primary);
+  opacity: 0; transition: opacity .15s ease;
+}
+.ps2-cursor::before { top: -6px; left: -6px; border-right: 0; border-bottom: 0; }
+.ps2-cursor::after  { bottom: -6px; right: -6px; border-left: 0; border-top: 0; }
+.ps2-cursor:hover::before, .ps2-cursor:hover::after,
+.ps2-cursor:focus-visible::before, .ps2-cursor:focus-visible::after,
+.ps2-cursor[data-active="true"]::before, .ps2-cursor[data-active="true"]::after {
+  opacity: 1; animation: ps2-blink 0.8s ease-in-out infinite;
+}
 
 #lovable-badge {
   display: none !important;
