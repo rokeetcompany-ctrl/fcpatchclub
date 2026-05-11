@@ -220,7 +220,7 @@ function HomeHub() {
           <div className="grid grid-cols-2 gap-3 md:grid-cols-5">
             {CONTINENTS.map(c => (
               <button key={c.id} onClick={() => setContinent(c.id)}
-                      data-active={continent === c.id}
+                      data-active={false}
                       className="ps2-cursor group relative overflow-hidden rounded-lg border border-border bg-card/60 p-4 text-left transition hover:-translate-y-0.5 hover:border-primary/50 hover:shadow-neon">
                 <div className="absolute inset-0 bg-grid opacity-10 transition group-hover:opacity-30" />
                 <div className="relative">
