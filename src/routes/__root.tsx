@@ -9,6 +9,7 @@ import {
 } from "@tanstack/react-router";
 
 import appCss from "../styles.css?url";
+import { CartProvider } from "@/lib/cart";
 
 function NotFoundComponent() {
   return (
@@ -72,19 +73,29 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { title: "PATCH CLUB · Camisas das Seleções · Rumo à Copa 2026" },
+      { name: "description", content: "E-commerce gamificado de camisas oficiais e lendárias das seleções. Compre 2 e leve 3. Frete grátis. Rumo à Copa 2026." },
+      { name: "author", content: "Patch Club" },
+      { property: "og:title", content: "PATCH CLUB · Camisas das Seleções · Rumo à Copa 2026" },
+      { property: "og:description", content: "E-commerce gamificado de camisas oficiais e lendárias das seleções. Compre 2 e leve 3. Frete grátis. Rumo à Copa 2026." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "PATCH CLUB · Camisas das Seleções · Rumo à Copa 2026" },
+      { name: "twitter:description", content: "E-commerce gamificado de camisas oficiais e lendárias das seleções. Compre 2 e leve 3. Frete grátis. Rumo à Copa 2026." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1615e283-d564-49bd-bd36-7afda00cc2c5/id-preview-a662f258--110f7677-778c-465b-9455-adfe9394cced.lovable.app-1778463462507.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/1615e283-d564-49bd-bd36-7afda00cc2c5/id-preview-a662f258--110f7677-778c-465b-9455-adfe9394cced.lovable.app-1778463462507.png" },
     ],
     links: [
       {
         rel: "stylesheet",
         href: appCss,
+      },
+      { rel: "preconnect", href: "https://fonts.googleapis.com" },
+      { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Rajdhani:wght@500;600;700&family=Sora:wght@300;400;500;600;700&display=swap",
       },
     ],
   }),
@@ -113,7 +124,11 @@ function RootComponent() {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <Outlet />
+      <CartProvider>
+        <div className="dark">
+          <Outlet />
+        </div>
+      </CartProvider>
     </QueryClientProvider>
   );
 }

@@ -9,38 +9,221 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as MissoesRouteImport } from './routes/missoes'
+import { Route as LoadingRouteImport } from './routes/loading'
+import { Route as HomeRouteImport } from './routes/home'
+import { Route as ColecaoRouteImport } from './routes/colecao'
+import { Route as CheckoutRouteImport } from './routes/checkout'
+import { Route as CarrinhoRouteImport } from './routes/carrinho'
+import { Route as BoxRouteImport } from './routes/box'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ColecoesIndexRouteImport } from './routes/colecoes.index'
+import { Route as ProdutoSlugRouteImport } from './routes/produto.$slug'
+import { Route as ColecoesContinentRouteImport } from './routes/colecoes.$continent'
 
+const MissoesRoute = MissoesRouteImport.update({
+  id: '/missoes',
+  path: '/missoes',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoadingRoute = LoadingRouteImport.update({
+  id: '/loading',
+  path: '/loading',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HomeRoute = HomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColecaoRoute = ColecaoRouteImport.update({
+  id: '/colecao',
+  path: '/colecao',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CheckoutRoute = CheckoutRouteImport.update({
+  id: '/checkout',
+  path: '/checkout',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CarrinhoRoute = CarrinhoRouteImport.update({
+  id: '/carrinho',
+  path: '/carrinho',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BoxRoute = BoxRouteImport.update({
+  id: '/box',
+  path: '/box',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ColecoesIndexRoute = ColecoesIndexRouteImport.update({
+  id: '/colecoes/',
+  path: '/colecoes/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProdutoSlugRoute = ProdutoSlugRouteImport.update({
+  id: '/produto/$slug',
+  path: '/produto/$slug',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ColecoesContinentRoute = ColecoesContinentRouteImport.update({
+  id: '/colecoes/$continent',
+  path: '/colecoes/$continent',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/box': typeof BoxRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/colecao': typeof ColecaoRoute
+  '/home': typeof HomeRoute
+  '/loading': typeof LoadingRoute
+  '/missoes': typeof MissoesRoute
+  '/colecoes/$continent': typeof ColecoesContinentRoute
+  '/produto/$slug': typeof ProdutoSlugRoute
+  '/colecoes/': typeof ColecoesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/box': typeof BoxRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/colecao': typeof ColecaoRoute
+  '/home': typeof HomeRoute
+  '/loading': typeof LoadingRoute
+  '/missoes': typeof MissoesRoute
+  '/colecoes/$continent': typeof ColecoesContinentRoute
+  '/produto/$slug': typeof ProdutoSlugRoute
+  '/colecoes': typeof ColecoesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/box': typeof BoxRoute
+  '/carrinho': typeof CarrinhoRoute
+  '/checkout': typeof CheckoutRoute
+  '/colecao': typeof ColecaoRoute
+  '/home': typeof HomeRoute
+  '/loading': typeof LoadingRoute
+  '/missoes': typeof MissoesRoute
+  '/colecoes/$continent': typeof ColecoesContinentRoute
+  '/produto/$slug': typeof ProdutoSlugRoute
+  '/colecoes/': typeof ColecoesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/box'
+    | '/carrinho'
+    | '/checkout'
+    | '/colecao'
+    | '/home'
+    | '/loading'
+    | '/missoes'
+    | '/colecoes/$continent'
+    | '/produto/$slug'
+    | '/colecoes/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/box'
+    | '/carrinho'
+    | '/checkout'
+    | '/colecao'
+    | '/home'
+    | '/loading'
+    | '/missoes'
+    | '/colecoes/$continent'
+    | '/produto/$slug'
+    | '/colecoes'
+  id:
+    | '__root__'
+    | '/'
+    | '/box'
+    | '/carrinho'
+    | '/checkout'
+    | '/colecao'
+    | '/home'
+    | '/loading'
+    | '/missoes'
+    | '/colecoes/$continent'
+    | '/produto/$slug'
+    | '/colecoes/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  BoxRoute: typeof BoxRoute
+  CarrinhoRoute: typeof CarrinhoRoute
+  CheckoutRoute: typeof CheckoutRoute
+  ColecaoRoute: typeof ColecaoRoute
+  HomeRoute: typeof HomeRoute
+  LoadingRoute: typeof LoadingRoute
+  MissoesRoute: typeof MissoesRoute
+  ColecoesContinentRoute: typeof ColecoesContinentRoute
+  ProdutoSlugRoute: typeof ProdutoSlugRoute
+  ColecoesIndexRoute: typeof ColecoesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/missoes': {
+      id: '/missoes'
+      path: '/missoes'
+      fullPath: '/missoes'
+      preLoaderRoute: typeof MissoesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/loading': {
+      id: '/loading'
+      path: '/loading'
+      fullPath: '/loading'
+      preLoaderRoute: typeof LoadingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/home': {
+      id: '/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof HomeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colecao': {
+      id: '/colecao'
+      path: '/colecao'
+      fullPath: '/colecao'
+      preLoaderRoute: typeof ColecaoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/checkout': {
+      id: '/checkout'
+      path: '/checkout'
+      fullPath: '/checkout'
+      preLoaderRoute: typeof CheckoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/carrinho': {
+      id: '/carrinho'
+      path: '/carrinho'
+      fullPath: '/carrinho'
+      preLoaderRoute: typeof CarrinhoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/box': {
+      id: '/box'
+      path: '/box'
+      fullPath: '/box'
+      preLoaderRoute: typeof BoxRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,11 +231,42 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/colecoes/': {
+      id: '/colecoes/'
+      path: '/colecoes'
+      fullPath: '/colecoes/'
+      preLoaderRoute: typeof ColecoesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/produto/$slug': {
+      id: '/produto/$slug'
+      path: '/produto/$slug'
+      fullPath: '/produto/$slug'
+      preLoaderRoute: typeof ProdutoSlugRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/colecoes/$continent': {
+      id: '/colecoes/$continent'
+      path: '/colecoes/$continent'
+      fullPath: '/colecoes/$continent'
+      preLoaderRoute: typeof ColecoesContinentRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  BoxRoute: BoxRoute,
+  CarrinhoRoute: CarrinhoRoute,
+  CheckoutRoute: CheckoutRoute,
+  ColecaoRoute: ColecaoRoute,
+  HomeRoute: HomeRoute,
+  LoadingRoute: LoadingRoute,
+  MissoesRoute: MissoesRoute,
+  ColecoesContinentRoute: ColecoesContinentRoute,
+  ProdutoSlugRoute: ProdutoSlugRoute,
+  ColecoesIndexRoute: ColecoesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
