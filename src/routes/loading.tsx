@@ -1,5 +1,6 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
+import { playStadiumBoot } from "@/lib/stadium-audio";
 
 export const Route = createFileRoute("/loading")({
   component: LoadingScreen,
