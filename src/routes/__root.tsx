@@ -10,7 +10,6 @@ import {
 
 import appCss from "../styles.css?url";
 import { CartProvider } from "@/lib/cart";
-import { Toaster } from "@/components/ui/sonner";
 
 function NotFoundComponent() {
   return (
@@ -128,7 +127,6 @@ function RootComponent() {
       <CartProvider>
         <div className="dark">
           <Outlet />
-          <Toaster richColors position="top-center" />
         </div>
       </CartProvider>
     </QueryClientProvider>
