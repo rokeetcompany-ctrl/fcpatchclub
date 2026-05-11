@@ -283,22 +283,15 @@ function Landing() {
 
         <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
           {[
-            { n: "LENDÁRIA", c: "var(--gold)", desc: "Ícones eternos. +500 XP" },
-            { n: "ÉPICA", c: "var(--epic)", desc: "Camisas marcantes. +250 XP" },
-            { n: "OURO", c: "var(--primary)", desc: "Drops de elite. +120 XP" },
-            { n: "PRATA", c: "var(--silver)", desc: "Essenciais do dia a dia. +50 XP" },
+            { n: "LENDÁRIA", color: "text-[color:var(--gold)]", border: "border-[color:var(--gold)]/40", desc: "Ícones eternos. +500 XP" },
+            { n: "ÉPICA", color: "text-[color:var(--epic)]", border: "border-[color:var(--epic)]/40", desc: "Camisas marcantes. +250 XP" },
+            { n: "OURO", color: "text-primary", border: "border-primary/40", desc: "Drops de elite. +120 XP" },
+            { n: "PRATA", color: "text-[color:var(--silver)]", border: "border-[color:var(--silver)]/40", desc: "Essenciais do dia a dia. +50 XP" },
           ].map((r) => (
-            <div
-              key={r.n}
-              className="group rounded-lg border bg-card/60 p-5 backdrop-blur"
-              style={{ borderColor: `oklch(from ${r.c} l c h / 0.4)` as any }}
-            >
+            <div key={r.n} className={`rounded-lg border ${r.border} bg-card/60 p-5 backdrop-blur`}>
               <div className="mb-3 flex items-center gap-2">
-                <Star className="h-4 w-4" style={{ color: `var(--${r.c.replace("var(--", "").replace(")", "")})` }} />
-                <span
-                  className="font-display text-sm font-black uppercase tracking-widest"
-                  style={{ color: `var(--${r.c.replace("var(--", "").replace(")", "")})` }}
-                >
+                <Star className={`h-4 w-4 ${r.color}`} />
+                <span className={`font-display text-sm font-black uppercase tracking-widest ${r.color}`}>
                   {r.n}
                 </span>
               </div>
