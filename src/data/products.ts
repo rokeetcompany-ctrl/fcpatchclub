@@ -22,6 +22,31 @@ export interface Product {
   description: string;
 }
 
+/**
+ * Regras estritas de tier (Força do Card).
+ * Toda camisa cai num tier; o preço é derivado do tier (com bônus por ano icônico
+ * em legendárias). Editar aqui altera toda a vitrine.
+ */
+export const TIER_RULES: Record<Rarity, {
+  label: string;
+  ovrMin: number;
+  ovrMax: number;
+  basePrice: number;        // preço base camisa atual
+  legendaryPrice: number;   // preço base camisa legendária
+  color: string;
+  desc: string;
+}> = {
+  lendario: { label: "LENDÁRIO", ovrMin: 92, ovrMax: 99, basePrice: 329, legendaryPrice: 449, color: "var(--gold)",   desc: "Tier máximo. Drops e relíquias." },
+  epico:    { label: "ÉPICO",    ovrMin: 88, ovrMax: 93, basePrice: 279, legendaryPrice: 369, color: "var(--epic)",   desc: "Top de mercado. Hype garantido." },
+  ouro:     { label: "OURO",     ovrMin: 82, ovrMax: 88, basePrice: 229, legendaryPrice: 299, color: "var(--gold)",   desc: "Premium acessível." },
+  prata:    { label: "PRATA",    ovrMin: 75, ovrMax: 82, basePrice: 189, legendaryPrice: 249, color: "var(--silver)", desc: "Entrada e clássicos." },
+};
+
+const yearBoost = (year: number): number => {
+  const iconic = new Set([1970, 1982, 1986, 1990, 1994, 1998, 2002, 2014, 2022]);
+  return iconic.has(year) ? 30 : 0;
+};
+
 const c = (
   team: string,
   flag: string,
@@ -45,7 +70,7 @@ const c = (
   ovr,
   attrs: { ata: ovr - 1, tec: ovr, mist: ovr - 2, hist: ovr - 3 },
   variants: ["home", "away"],
-  price: 229,
+  price: TIER_RULES[rarity].basePrice,
   primary,
   secondary,
   accent,
@@ -77,7 +102,7 @@ const l = (
   ovr,
   attrs: { ata: ovr, tec: ovr - 1, mist: ovr - 2, hist: 99 },
   variants: [variant],
-  price: 249,
+  price: TIER_RULES[rarity].legendaryPrice + yearBoost(year),
   primary,
   secondary,
   accent,
