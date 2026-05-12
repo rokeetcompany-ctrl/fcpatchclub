@@ -1,6 +1,7 @@
 import { Link, useLocation } from "@tanstack/react-router";
 import { Home, Compass, Library, Package, ShoppingCart, Trophy } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { ThemeToggle } from "@/components/game/ThemeToggle";
 import type { ReactNode } from "react";
 
 const NAV = [
@@ -40,15 +41,23 @@ export function GameLayout({ children }: { children: ReactNode }) {
               MISSÕES
             </Link>
           </nav>
-          <Link to="/carrinho" className="relative flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-4 py-2 font-tactical text-xs font-bold uppercase tracking-widest text-primary transition hover:bg-primary/20">
-            <ShoppingCart className="h-4 w-4" />
-            CARRINHO
-            {totals.units > 0 && (
-              <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-black text-primary-foreground">{totals.units}</span>
-            )}
-          </Link>
+          <div className="flex items-center gap-3">
+            <ThemeToggle />
+            <Link to="/carrinho" className="relative flex items-center gap-2 rounded-md border border-primary/60 bg-primary/10 px-4 py-2 font-tactical text-xs font-bold uppercase tracking-widest text-primary transition hover:bg-primary/20">
+              <ShoppingCart className="h-4 w-4" />
+              CARRINHO
+              {totals.units > 0 && (
+                <span className="ml-1 rounded-full bg-primary px-2 py-0.5 text-[10px] font-black text-primary-foreground">{totals.units}</span>
+              )}
+            </Link>
+          </div>
         </div>
       </header>
+
+      {/* mobile theme toggle (floating) */}
+      <div className="fixed right-3 top-3 z-40 md:hidden">
+        <ThemeToggle />
+      </div>
 
       {children}
 
