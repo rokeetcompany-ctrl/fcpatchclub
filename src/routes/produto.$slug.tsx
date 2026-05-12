@@ -91,6 +91,7 @@ function ProductPage() {
     { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant },
   ]), [p, variant]);
   const [shotIdx, setShotIdx] = useState(0);
+  const [lightbox, setLightbox] = useState(false);
   const shot = gallery[shotIdx];
 
   const handleAdd = (buyNow = false) => {
