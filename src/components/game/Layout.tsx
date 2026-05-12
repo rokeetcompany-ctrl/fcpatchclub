@@ -54,6 +54,11 @@ export function GameLayout({ children }: { children: ReactNode }) {
         </div>
       </header>
 
+      {/* mobile theme toggle (floating) */}
+      <div className="fixed right-3 top-3 z-40 md:hidden">
+        <ThemeToggle />
+      </div>
+
       {children}
 
       {/* mobile bottom nav */}
