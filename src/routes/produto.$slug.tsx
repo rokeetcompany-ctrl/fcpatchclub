@@ -2,10 +2,11 @@ import { createFileRoute, Link, notFound, useNavigate } from "@tanstack/react-ro
 import { GameLayout } from "@/components/game/Layout";
 import { findProduct, RARITY_META, type Product, type Variant } from "@/data/products";
 import { Jersey } from "@/components/game/Jersey";
+import { JerseyLightbox } from "@/components/game/JerseyLightbox";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft, Heart, ShoppingCart, Zap, Truck, ShieldCheck, Award, Tag,
-  ChevronRight, Star, Sparkles, Shirt, Trophy, History, Flame,
+  ChevronRight, Star, Sparkles, Shirt, Trophy, History, Flame, Expand,
 } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { toast } from "sonner";
