@@ -136,15 +136,40 @@ function ProductPage() {
               <div className="absolute bottom-3 left-3 z-10 rounded-md bg-background/60 px-2 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest text-muted-foreground backdrop-blur">
                 {shot.label}
               </div>
-              <div className="relative aspect-square">
+              <button
+                onClick={(e) => { e.stopPropagation(); setLightbox(true); }}
+                aria-label="Ampliar imagem"
+                className="absolute right-3 bottom-3 z-10 inline-flex items-center gap-1 rounded-md border border-primary/60 bg-background/70 px-2 py-1 font-tactical text-[10px] font-bold uppercase tracking-widest text-primary backdrop-blur transition hover:bg-primary/20"
+              >
+                <Expand className="h-3.5 w-3.5" /> Zoom
+              </button>
+              <button
+                type="button"
+                onClick={() => setLightbox(true)}
+                aria-label="Abrir galeria em tela cheia"
+                className="relative block aspect-square w-full cursor-zoom-in"
+              >
                 <Jersey
                   key={shot.key + shot.useVariant}
                   primary={p.primary} secondary={p.secondary} accent={p.accent}
                   variant={shot.useVariant} number={shot.number}
                   className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
                 />
-              </div>
+              </button>
             </div>
+
+            <JerseyLightbox
+              open={lightbox}
+              shots={gallery}
+              index={shotIdx}
+              onIndexChange={setShotIdx}
+              onClose={() => setLightbox(false)}
+              primary={p.primary}
+              secondary={p.secondary}
+              accent={p.accent}
+              rarityColor={meta.color}
+              team={p.team}
+            />
 
             {/* THUMBNAILS */}
             <div className="grid grid-cols-4 gap-2">
