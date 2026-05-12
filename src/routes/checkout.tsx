@@ -1,8 +1,8 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { GameLayout, PageHero } from "@/components/game/Layout";
 import { useCart } from "@/lib/cart";
 import { useState } from "react";
-import { CreditCard, Smartphone, Wallet, ShieldCheck, ChevronRight, Lock, Check } from "lucide-react";
+import { CreditCard, Smartphone, Wallet, ShieldCheck, ChevronRight, Lock, Check, Zap, Coins, Gift, ArrowLeft } from "lucide-react";
+import { commerce } from "@/lib/commerce";
 
 export const Route = createFileRoute("/checkout")({
   head: () => ({ meta: [{ title: "Checkout · PATCH CLUB" }, { name: "description", content: "Checkout rápido e seguro." }] }),
