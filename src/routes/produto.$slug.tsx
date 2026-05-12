@@ -3,6 +3,7 @@ import { GameLayout } from "@/components/game/Layout";
 import { findProduct, RARITY_META, type Product, type Variant } from "@/data/products";
 import { Jersey } from "@/components/game/Jersey";
 import { JerseyLightbox } from "@/components/game/JerseyLightbox";
+import { OvrMeter } from "@/components/game/OvrMeter";
 import { useMemo, useState } from "react";
 import {
   ArrowLeft, Heart, ShoppingCart, Zap, Truck, ShieldCheck, Award, Tag,
