@@ -287,18 +287,9 @@ function ProductPage() {
               </div>
             </div>
 
-            {/* STATS */}
-            <div className="mt-6 rounded-xl border bg-card/60 p-4" style={{ borderColor: `${meta.color}55` }}>
-              <div className="mb-3 flex items-center justify-between">
-                <p className="font-display text-sm font-black uppercase tracking-widest" style={{ color: meta.color }}>FORÇA DO CARD</p>
-                <span className="font-display text-2xl font-black text-glow" style={{ color: meta.color }}>{p.ovr}</span>
-              </div>
-              <div className="grid grid-cols-2 gap-3">
-                <StatBar label="ATA" value={p.attrs.ata} />
-                <StatBar label="TÉC" value={p.attrs.tec} />
-                <StatBar label="MÍST" value={p.attrs.mist} />
-                <StatBar label="HIST" value={p.attrs.hist} />
-              </div>
+            {/* FORÇA DO CARD — anel + breakdown */}
+            <div className="mt-6">
+              <OvrMeter product={p} size="lg" />
             </div>
 
             {/* CTA — sticky on mobile */}
