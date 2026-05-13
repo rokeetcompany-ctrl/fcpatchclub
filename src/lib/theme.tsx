@@ -53,7 +53,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const wrappedSet = (t: Theme) => { setUserChose(true); setTheme(t); };
 
   return (
-    <Ctx.Provider value={{ theme, setTheme, toggle: () => setTheme(t => (t === "dark" ? "light" : "dark")) }}>
+    <Ctx.Provider value={{ theme, setTheme: wrappedSet, toggle: () => wrappedSet(theme === "dark" ? "light" : "dark") }}>
       {children}
     </Ctx.Provider>
   );
