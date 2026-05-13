@@ -158,7 +158,7 @@ function Landing() {
           <span className="text-[color:var(--epic)]">Épicas</span>,{" "}
           <span className="text-[color:var(--gold)]">Ouro</span> e{" "}
           <span className="text-foreground">Prata</span> das seleções da Copa do Mundo.
-          Dropshipping rápido, frete grátis,
+          Envio rápido, frete grátis,
           <span className="font-bold text-primary"> Compre 2 & Leve 3</span>.
         </p>
 
@@ -187,9 +187,9 @@ function Landing() {
         {/* STATS STRIP */}
         <div className="mt-12 grid w-full grid-cols-2 gap-3 md:mt-16 md:grid-cols-4">
           {[
-            { k: "365", l: "DIAS · COPA" },
+            { k: daysToCup.toString(), l: "DIAS · COPA" },
+            { k: "48", l: "SELEÇÕES" },
             { k: "12.5K+", l: "USUÁRIOS ON" },
-            { k: "150+", l: "PAÍSES" },
             { k: "100%", l: "DROPS LIMITADOS" },
           ].map((s, i) => (
             <div
@@ -462,7 +462,7 @@ function Landing() {
                 COMUNIDADE
               </p>
               <ul className="mt-3 space-y-2 text-xs text-muted-foreground">
-                <li className="inline-flex items-center gap-1.5"><Globe className="h-3 w-3" /> 150+ países</li>
+                <li className="inline-flex items-center gap-1.5"><Globe className="h-3 w-3" /> 48 seleções</li>
                 <li className="inline-flex items-center gap-1.5"><Sparkles className="h-3 w-3" /> 12.540 jogadores online</li>
                 <li className="inline-flex items-center gap-1.5"><Trophy className="h-3 w-3" /> 8.320 camisas coletadas</li>
               </ul>
