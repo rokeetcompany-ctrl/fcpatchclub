@@ -71,26 +71,16 @@ const localAdapter: CommerceAdapter = {
   },
 };
 
-/* ================== SHOPIFY ADAPTER (stub) ==================
- * Implementação real fica desativada até o Lovable Cloud + Shopify
- * estarem habilitados. Quando ativar, descomentar e preencher.
- *
- * const shopifyAdapter: CommerceAdapter = {
- *   id: "shopify",
- *   async listCollections() {
- *     const r = await fetch(`https://${DOMAIN}/api/2024-10/graphql.json`, { ... });
- *     return ...;
- *   },
- *   ...
- * };
+/* ================== SHOPIFY ADAPTER ==================
+ * Real implementation in `./shopify`. Activated automatically when env vars
+ * VITE_SHOPIFY_DOMAIN and VITE_SHOPIFY_STOREFRONT_TOKEN are present.
  */
-const shopifyAdapter: CommerceAdapter | null = null;
+import { shopifyAdapter, shopifyConfigured } from "@/lib/shopify";
 
 /* ================== EXPORT ================== */
 
-const SHOPIFY_DOMAIN = (import.meta as any).env?.VITE_SHOPIFY_DOMAIN as string | undefined;
-
-export const commerce: CommerceAdapter =
-  SHOPIFY_DOMAIN && shopifyAdapter ? shopifyAdapter : localAdapter;
+export const commerce: CommerceAdapter = shopifyConfigured
+  ? shopifyAdapter
+  : localAdapter;
 
 export const isShopify = commerce.id === "shopify";

@@ -318,19 +318,48 @@ export const shopifyAdapter: CommerceAdapter = {
   },
 
   async createCheckout(items: CartItem[]): Promise<CheckoutResult> {
-    // Each CartItem is expected to carry a Shopify variant GID in `variantId`.
-    // The local adapter stores "home"|"away" instead — fall back to internal /checkout
-    // when items don't look like Shopify GIDs (e.g. mixed legacy state).
-    const lines = items
-      .filter(i => typeof i.variantId === "string" && i.variantId.startsWith("gid://"))
-      .map(i => ({ merchandiseId: i.variantId, quantity: i.qty }));
+    // Map our CartItem (productId + variant: "home"|"away") into Shopify
+    // merchandise IDs by looking up each product's matching variant.
+    // To minimize calls we batch-fetch each product once.
+    const uniqueProductIds = Array.from(new Set(items.map(i => i.productId)));
+    const productsByGid = new Map<string, ShopifyProductNode>();
+
+    // Items can carry either a Shopify GID (gid://shopify/Product/...) or a
+    // local slug. We support both: GIDs are looked up via `node`, slugs via
+    // `productByHandle`.
+    const Q_NODE = /* GraphQL */ `
+      ${PRODUCT_FIELDS}
+      query Node($id: ID!) { node(id: $id) { ... on Product { ...ProductCard } } }
+    `;
+    for (const pid of uniqueProductIds) {
+      if (pid.startsWith("gid://")) {
+        const data = await storefront<{ node: ShopifyProductNode | null }>(Q_NODE, { id: pid });
+        if (data.node) productsByGid.set(pid, data.node);
+      } else {
+        const data = await storefront<{ product: ShopifyProductNode | null }>(Q_PRODUCT, { handle: pid });
+        if (data.product) productsByGid.set(pid, data.product);
+      }
+    }
+
+    const lines: { merchandiseId: string; quantity: number }[] = [];
+    for (const i of items) {
+      const node = productsByGid.get(i.productId);
+      if (!node) continue;
+      // Pick the variant whose Style option matches our internal "home"/"away".
+      const target = i.variant === "away" ? "away" : "home";
+      const match =
+        node.variants.edges.find(e =>
+          e.node.selectedOptions.some(o => {
+            const k = o.name.toLowerCase();
+            return (k === "style" || k === "estilo" || k === "modelo") &&
+              o.value.toLowerCase().includes(target);
+          }),
+        ) ?? node.variants.edges[0];
+      if (match) lines.push({ merchandiseId: match.node.id, quantity: i.qty });
+    }
 
     if (lines.length === 0) {
-      return {
-        url: "/checkout",
-        external: false,
-        totals: { subtotal: 0, discount: 0, total: 0 },
-      };
+      return { url: "/checkout", external: false, totals: { subtotal: 0, discount: 0, total: 0 } };
     }
 
     const data = await storefront<{
@@ -338,25 +367,22 @@ export const shopifyAdapter: CommerceAdapter = {
         cart: {
           id: string;
           checkoutUrl: string;
-          cost: {
-            subtotalAmount: { amount: string };
-            totalAmount: { amount: string };
-          };
+          cost: { subtotalAmount: { amount: string }; totalAmount: { amount: string } };
         } | null;
         userErrors: { message: string }[];
       };
     }>(M_CART_CREATE, { lines });
 
-    const c = data.cartCreate.cart;
-    if (!c) {
+    const cart = data.cartCreate.cart;
+    if (!cart) {
       throw new Error(
         `Shopify cartCreate failed: ${data.cartCreate.userErrors.map(e => e.message).join(", ")}`,
       );
     }
-    const subtotal = Number.parseFloat(c.cost.subtotalAmount.amount);
-    const total = Number.parseFloat(c.cost.totalAmount.amount);
+    const subtotal = Number.parseFloat(cart.cost.subtotalAmount.amount);
+    const total = Number.parseFloat(cart.cost.totalAmount.amount);
     return {
-      url: c.checkoutUrl,
+      url: cart.checkoutUrl,
       external: true,
       totals: { subtotal, discount: subtotal - total, total },
     };
