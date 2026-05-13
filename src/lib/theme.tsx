@@ -2,6 +2,7 @@ import { createContext, useContext, useEffect, useState, type ReactNode } from "
 
 export type Theme = "light" | "dark";
 const KEY = "patchclub-theme";
+const DEFAULT_THEME: Theme = "light";
 
 const Ctx = createContext<{
   theme: Theme;
@@ -9,15 +10,17 @@ const Ctx = createContext<{
   toggle: () => void;
 } | null>(null);
 
-export function ThemeProvider({ children }: { children: ReactNode }) {
-  const [theme, setTheme] = useState<Theme>("dark");
+function readInitial(): Theme {
+  if (typeof document !== "undefined") {
+    // Inline script in __root.tsx already set the class before hydration.
+    if (document.documentElement.classList.contains("dark")) return "dark";
+    if (document.documentElement.classList.contains("light")) return "light";
+  }
+  return DEFAULT_THEME;
+}
 
-  useEffect(() => {
-    try {
-      const s = (window.localStorage.getItem(KEY) as Theme | null) ?? null;
-      if (s === "light" || s === "dark") setTheme(s);
-    } catch {}
-  }, []);
+export function ThemeProvider({ children }: { children: ReactNode }) {
+  const [theme, setTheme] = useState<Theme>(readInitial);
 
   useEffect(() => {
     if (typeof document === "undefined") return;
