@@ -72,6 +72,17 @@ function Landing() {
   const nav = useNavigate();
   const [audioReady, setAudioReady] = useState(false);
   const audioCtxRef = useRef<AudioContext | null>(null);
+  const [daysToCup, setDaysToCup] = useState(() => {
+    const target = new Date("2026-06-11T17:00:00Z").getTime();
+    return Math.max(0, Math.ceil((target - Date.now()) / 86400000));
+  });
+  useEffect(() => {
+    const target = new Date("2026-06-11T17:00:00Z").getTime();
+    const t = setInterval(() => {
+      setDaysToCup(Math.max(0, Math.ceil((target - Date.now()) / 86400000)));
+    }, 60_000);
+    return () => clearInterval(t);
+  }, []);
 
   // Pre-arm AudioContext on first interaction so the loading screen audio plays.
   useEffect(() => {
