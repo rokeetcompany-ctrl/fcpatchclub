@@ -118,6 +118,17 @@
     color: var(--color-foreground);
     font-family: var(--font-body);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 320ms ease, color 320ms ease;
+  }
+  /* Smooth theme transition for theme-driven surfaces */
+  *, *::before, *::after {
+    transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+    transition-duration: 240ms;
+    transition-timing-function: cubic-bezier(.2,.7,.2,1);
+  }
+  /* Don't slow down explicit transforms / opacity animations */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { transition-duration: 0ms !important; }
   }
   ::-webkit-scrollbar { width: 6px; height: 6px; }
   ::-webkit-scrollbar-thumb { background: oklch(0.88 0.28 142 / 0.4); border-radius: 6px; }
