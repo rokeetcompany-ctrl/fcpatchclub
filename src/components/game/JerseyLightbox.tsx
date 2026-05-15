@@ -163,12 +163,22 @@ export function JerseyLightbox({
           className="absolute inset-0 grid place-items-center transition-transform duration-200 ease-out"
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
-          <Jersey
-            key={shot.key + shot.useVariant}
-            primary={primary} secondary={secondary} accent={accent}
-            variant={shot.useVariant} number={shot.number}
-            className="h-[70vh] max-h-[70vh] w-auto drop-shadow-[0_25px_40px_rgba(0,0,0,0.7)]"
-          />
+          {shot.image ? (
+            <img
+              key={shot.key}
+              src={shot.image}
+              alt={`${team} — ${shot.label}`}
+              draggable={false}
+              className="h-[70vh] max-h-[70vh] w-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.5)]"
+            />
+          ) : (
+            <Jersey
+              key={shot.key + shot.useVariant}
+              primary={primary} secondary={secondary} accent={accent}
+              variant={shot.useVariant} number={shot.number}
+              className="h-[70vh] max-h-[70vh] w-auto drop-shadow-[0_25px_40px_rgba(0,0,0,0.7)]"
+            />
+          )}
         </div>
 
         {/* Arrows */}
