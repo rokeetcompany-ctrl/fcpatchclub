@@ -84,13 +84,26 @@ function ProductPage() {
   const finalPrice = p.price + (FABRICS[fabric]?.surcharge ?? 0);
   const installments = finalPrice / 12;
 
-  // Gallery: 4 angles built from the Jersey component
-  const gallery = useMemo(() => ([
-    { key: "front", label: "FRENTE", number: p.year % 100, useVariant: variant },
-    { key: "back",  label: "COSTAS", number: 10,           useVariant: variant },
-    { key: "alt",   label: p.variants.length > 1 ? "II" : "DETALHE", number: p.year % 100, useVariant: (p.variants[1] ?? variant) },
-    { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant },
-  ]), [p, variant]);
+  // Gallery: real Shopify images when available, else procedural SVG <Jersey />.
+  // Each shot carries either an `image` URL or the params for the Jersey SVG.
+  const gallery = useMemo(() => {
+    const labels = ["FRENTE", "COSTAS", p.variants.length > 1 ? "II" : "DETALHE", "PATCH"];
+    if (p.images && p.images.length > 0) {
+      return p.images.slice(0, 4).map((url, i) => ({
+        key: `img-${i}`,
+        label: labels[i] ?? `FOTO ${i + 1}`,
+        image: url,
+        number: p.year % 100,
+        useVariant: variant,
+      }));
+    }
+    return [
+      { key: "front", label: "FRENTE", number: p.year % 100, useVariant: variant, image: undefined as string | undefined },
+      { key: "back",  label: "COSTAS", number: 10,           useVariant: variant, image: undefined },
+      { key: "alt",   label: p.variants.length > 1 ? "II" : "DETALHE", number: p.year % 100, useVariant: (p.variants[1] ?? variant), image: undefined },
+      { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant, image: undefined },
+    ];
+  }, [p, variant]);
   const [shotIdx, setShotIdx] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const shot = gallery[shotIdx];
