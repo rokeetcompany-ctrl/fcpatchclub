@@ -266,6 +266,55 @@ const M_METAFIELDS_SET = /* GraphQL */ `
   }
 `;
 
+/**
+ * Attaches gallery images to a product. Shopify will fetch each URL and host
+ * it on its own CDN, so the URLs you pass here only need to be publicly
+ * reachable at seed time. Already-attached images (matched by alt text) are
+ * skipped so the seed stays idempotent.
+ */
+const Q_PRODUCT_IMAGES = /* GraphQL */ `
+  query ProductImages($id: ID!) {
+    product(id: $id) {
+      images(first: 20) { edges { node { id altText } } }
+    }
+  }
+`;
+
+const M_PRODUCT_CREATE_MEDIA = /* GraphQL */ `
+  mutation ProductCreateMedia($productId: ID!, $media: [CreateMediaInput!]!) {
+    productCreateMedia(productId: $productId, media: $media) {
+      media { ... on MediaImage { id alt } }
+      mediaUserErrors { field message code }
+    }
+  }
+`;
+
+async function attachImages(productId, handle, urls) {
+  if (!urls?.length) return;
+  const existing = await gql(Q_PRODUCT_IMAGES, { id: productId });
+  const present = new Set(
+    (existing.product?.images.edges ?? []).map(e => e.node.altText).filter(Boolean),
+  );
+  const fresh = urls
+    .map((u, i) => ({ url: u, alt: `${handle}-${i + 1}` }))
+    .filter(m => !present.has(m.alt));
+  if (!fresh.length) {
+    console.log(`  ↳ images already attached (${urls.length})`);
+    return;
+  }
+  const data = await gql(M_PRODUCT_CREATE_MEDIA, {
+    productId,
+    media: fresh.map(m => ({
+      originalSource: m.url,
+      alt: m.alt,
+      mediaContentType: "IMAGE",
+    })),
+  });
+  const errs = data.productCreateMedia.mediaUserErrors;
+  if (errs?.length) console.warn(`  ! image errors:`, errs);
+  console.log(`  ↳ images attached (${fresh.length}/${urls.length})`);
+}
+
 function metafieldsFor(productId, mfs) {
   return Object.entries(mfs).map(([key, raw]) => {
     const def = DEFINITIONS.find(d => d.key === key);
@@ -314,6 +363,8 @@ async function upsertProduct(seed) {
   const errs = data.metafieldsSet.userErrors;
   if (errs?.length) throw new Error(`metafieldsSet ${seed.handle}: ${JSON.stringify(errs)}`);
   console.log(`  ↳ metafields set (${Object.keys(seed.metafields).length})`);
+
+  await attachImages(productId, seed.handle, seed.images);
 }
 
 /* ============================ Main ============================ */
