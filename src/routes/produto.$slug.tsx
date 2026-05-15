@@ -288,7 +288,7 @@ function ProductPage() {
               </div>
             </div>
 
-            {/* FORÇA DO CARD — anel + breakdown */}
+            {/* FORÇA DA CAMISA — anel + breakdown */}
             <div className="mt-6">
               <OvrMeter product={p} size="lg" />
             </div>

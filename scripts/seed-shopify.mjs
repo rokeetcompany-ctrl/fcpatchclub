@@ -51,7 +51,7 @@ async function gql(query, variables = {}) {
 const NS = "patchclub";
 const DEFINITIONS = [
   { key: "rarity",    name: "Raridade",     type: "single_line_text_field", description: "lendario|epico|ouro|prata" },
-  { key: "ovr",       name: "OVR",          type: "number_integer",         description: "Força do card 1-99" },
+  { key: "ovr",       name: "OVR",          type: "number_integer",         description: "Força da Camisa 1-99" },
   { key: "stats",     name: "Stats",        type: "json",                   description: "{ata,tec,mist,hist}" },
   { key: "continent", name: "Continente",   type: "single_line_text_field", description: "america-sul|europa|america-norte|asia|africa" },
   { key: "team",      name: "Seleção",      type: "single_line_text_field" },

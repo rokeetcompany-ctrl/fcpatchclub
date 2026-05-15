@@ -44,7 +44,7 @@ Create each one under **Settings → Custom data → Products → Add definition
 ### 2.2 `patchclub.ovr`
 - **Type:** `number_integer`
 - **Validation:** min `1`, max `99`
-- **Use:** "Força do Card" meter on PDP and JerseyCard.
+- **Use:** "Força da Camisa" meter on PDP and JerseyCard.
 
 ### 2.3 `patchclub.stats`
 - **Type:** `json`

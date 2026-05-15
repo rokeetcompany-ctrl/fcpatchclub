@@ -23,7 +23,7 @@ export interface Product {
 }
 
 /**
- * Regras estritas de tier (Força do Card).
+ * Regras estritas de tier (Força da Camisa).
  * Toda camisa cai num tier; o preço é derivado do tier (com bônus por ano icônico
  * em legendárias). Editar aqui altera toda a vitrine.
  */
