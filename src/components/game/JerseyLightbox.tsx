@@ -9,6 +9,8 @@ export interface LightboxShot {
   label: string;
   number: number;
   useVariant: Variant;
+  /** Real photo URL (Shopify CDN). When present, renders <img> instead of the SVG fallback. */
+  image?: string;
 }
 
 interface Props {
