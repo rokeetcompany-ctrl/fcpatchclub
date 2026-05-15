@@ -163,12 +163,23 @@ function ProductPage() {
                 aria-label="Abrir galeria em tela cheia"
                 className="relative block aspect-square w-full cursor-zoom-in"
               >
-                <Jersey
-                  key={shot.key + shot.useVariant}
-                  primary={p.primary} secondary={p.secondary} accent={p.accent}
-                  variant={shot.useVariant} number={shot.number}
-                  className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
-                />
+                {shot.image ? (
+                  <img
+                    key={shot.key}
+                    src={shot.image}
+                    alt={`${p.team} ${p.year} — ${shot.label}`}
+                    loading="eager"
+                    decoding="async"
+                    className="absolute inset-0 m-auto h-full w-full animate-fade-in object-contain p-4 drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)]"
+                  />
+                ) : (
+                  <Jersey
+                    key={shot.key + shot.useVariant}
+                    primary={p.primary} secondary={p.secondary} accent={p.accent}
+                    variant={shot.useVariant} number={shot.number}
+                    className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
+                  />
+                )}
               </button>
             </div>
 
@@ -185,7 +196,7 @@ function ProductPage() {
               team={p.team}
             />
 
-            {/* THUMBNAILS */}
+            {/* THUMBNAILS — visible on all breakpoints, with horizontal scroll on mobile */}
             <div className="grid grid-cols-4 gap-2">
               {gallery.map((g, i) => (
                 <button key={g.key} onClick={() => setShotIdx(i)}
@@ -194,8 +205,13 @@ function ProductPage() {
                         aria-label={`Ver ${g.label}`}>
                   <div className="absolute inset-0 bg-grid opacity-20" />
                   <div className="relative grid h-full place-items-center">
-                    <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent}
-                            variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                    {g.image ? (
+                      <img src={g.image} alt={g.label} loading="lazy" decoding="async"
+                           className="h-full w-full object-contain p-2" />
+                    ) : (
+                      <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent}
+                              variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                    )}
                   </div>
                   <span className="absolute inset-x-0 bottom-0 bg-background/70 py-0.5 text-center font-tactical text-[8px] font-bold uppercase tracking-widest">
                     {g.label}
