@@ -20,6 +20,7 @@ export interface Product {
   secondary: string;
   accent: string;
   description: string;
+  images?: string[];     // Real photos from Shopify (CDN URLs). When empty, frontend renders the SVG <Jersey /> placeholder.
 }
 
 /**
