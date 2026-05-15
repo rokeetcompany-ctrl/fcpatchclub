@@ -178,6 +178,16 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
     Number.parseFloat(node.priceRange.minVariantPrice.amount || "0"),
   );
 
+  // Real photos: featuredImage first, then the rest of the gallery,
+  // de-duplicated. The frontend uses these directly when present and falls
+  // back to the SVG <Jersey /> when the array is empty.
+  const imgs: string[] = [];
+  if (node.featuredImage?.url) imgs.push(node.featuredImage.url);
+  for (const e of node.images.edges) {
+    const u = e.node.url;
+    if (u && !imgs.includes(u)) imgs.push(u);
+  }
+
   return {
     id: node.id,
     slug: node.handle,
@@ -196,6 +206,7 @@ export function mapShopifyProduct(node: ShopifyProductNode): Product {
     secondary: colors.secondary,
     accent: colors.accent,
     description: node.description ?? "",
+    images: imgs.length ? imgs : undefined,
   };
 }
 

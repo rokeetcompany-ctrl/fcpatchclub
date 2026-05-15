@@ -84,13 +84,26 @@ function ProductPage() {
   const finalPrice = p.price + (FABRICS[fabric]?.surcharge ?? 0);
   const installments = finalPrice / 12;
 
-  // Gallery: 4 angles built from the Jersey component
-  const gallery = useMemo(() => ([
-    { key: "front", label: "FRENTE", number: p.year % 100, useVariant: variant },
-    { key: "back",  label: "COSTAS", number: 10,           useVariant: variant },
-    { key: "alt",   label: p.variants.length > 1 ? "II" : "DETALHE", number: p.year % 100, useVariant: (p.variants[1] ?? variant) },
-    { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant },
-  ]), [p, variant]);
+  // Gallery: real Shopify images when available, else procedural SVG <Jersey />.
+  // Each shot carries either an `image` URL or the params for the Jersey SVG.
+  const gallery = useMemo(() => {
+    const labels = ["FRENTE", "COSTAS", p.variants.length > 1 ? "II" : "DETALHE", "PATCH"];
+    if (p.images && p.images.length > 0) {
+      return p.images.slice(0, 4).map((url, i) => ({
+        key: `img-${i}`,
+        label: labels[i] ?? `FOTO ${i + 1}`,
+        image: url,
+        number: p.year % 100,
+        useVariant: variant,
+      }));
+    }
+    return [
+      { key: "front", label: "FRENTE", number: p.year % 100, useVariant: variant, image: undefined as string | undefined },
+      { key: "back",  label: "COSTAS", number: 10,           useVariant: variant, image: undefined },
+      { key: "alt",   label: p.variants.length > 1 ? "II" : "DETALHE", number: p.year % 100, useVariant: (p.variants[1] ?? variant), image: undefined },
+      { key: "patch", label: "PATCH",  number: p.ovr,        useVariant: variant, image: undefined },
+    ];
+  }, [p, variant]);
   const [shotIdx, setShotIdx] = useState(0);
   const [lightbox, setLightbox] = useState(false);
   const shot = gallery[shotIdx];
@@ -150,12 +163,23 @@ function ProductPage() {
                 aria-label="Abrir galeria em tela cheia"
                 className="relative block aspect-square w-full cursor-zoom-in"
               >
-                <Jersey
-                  key={shot.key + shot.useVariant}
-                  primary={p.primary} secondary={p.secondary} accent={p.accent}
-                  variant={shot.useVariant} number={shot.number}
-                  className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
-                />
+                {shot.image ? (
+                  <img
+                    key={shot.key}
+                    src={shot.image}
+                    alt={`${p.team} ${p.year} — ${shot.label}`}
+                    loading="eager"
+                    decoding="async"
+                    className="absolute inset-0 m-auto h-full w-full animate-fade-in object-contain p-4 drop-shadow-[0_20px_30px_rgba(0,0,0,0.45)]"
+                  />
+                ) : (
+                  <Jersey
+                    key={shot.key + shot.useVariant}
+                    primary={p.primary} secondary={p.secondary} accent={p.accent}
+                    variant={shot.useVariant} number={shot.number}
+                    className="absolute inset-0 m-auto h-[85%] w-auto animate-fade-in drop-shadow-[0_20px_30px_rgba(0,0,0,0.7)]"
+                  />
+                )}
               </button>
             </div>
 
@@ -172,7 +196,7 @@ function ProductPage() {
               team={p.team}
             />
 
-            {/* THUMBNAILS */}
+            {/* THUMBNAILS — visible on all breakpoints, with horizontal scroll on mobile */}
             <div className="grid grid-cols-4 gap-2">
               {gallery.map((g, i) => (
                 <button key={g.key} onClick={() => setShotIdx(i)}
@@ -181,8 +205,13 @@ function ProductPage() {
                         aria-label={`Ver ${g.label}`}>
                   <div className="absolute inset-0 bg-grid opacity-20" />
                   <div className="relative grid h-full place-items-center">
-                    <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent}
-                            variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                    {g.image ? (
+                      <img src={g.image} alt={g.label} loading="lazy" decoding="async"
+                           className="h-full w-full object-contain p-2" />
+                    ) : (
+                      <Jersey primary={p.primary} secondary={p.secondary} accent={p.accent}
+                              variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                    )}
                   </div>
                   <span className="absolute inset-x-0 bottom-0 bg-background/70 py-0.5 text-center font-tactical text-[8px] font-bold uppercase tracking-widest">
                     {g.label}
@@ -288,7 +317,7 @@ function ProductPage() {
               </div>
             </div>
 
-            {/* FORÇA DO CARD — anel + breakdown */}
+            {/* FORÇA DA CAMISA — anel + breakdown */}
             <div className="mt-6">
               <OvrMeter product={p} size="lg" />
             </div>

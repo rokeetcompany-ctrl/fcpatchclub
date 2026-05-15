@@ -50,7 +50,7 @@ export function OvrMeter({ product, size = "md", className = "" }: Props) {
       <div className="min-w-0 flex-1">
         <div className="mb-2 flex items-center justify-between gap-2">
           <p className="font-display text-xs font-black uppercase tracking-widest" style={{ color: meta.color }}>
-            FORÇA DO CARD
+            FORÇA DA CAMISA
           </p>
           <span className="rounded-md px-2 py-0.5 font-tactical text-[9px] font-black tracking-widest"
                 style={{ background: `${meta.color}22`, color: meta.color, border: `1px solid ${meta.color}55` }}>

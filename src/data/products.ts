@@ -20,10 +20,11 @@ export interface Product {
   secondary: string;
   accent: string;
   description: string;
+  images?: string[];     // Real photos from Shopify (CDN URLs). When empty, frontend renders the SVG <Jersey /> placeholder.
 }
 
 /**
- * Regras estritas de tier (Força do Card).
+ * Regras estritas de tier (Força da Camisa).
  * Toda camisa cai num tier; o preço é derivado do tier (com bônus por ano icônico
  * em legendárias). Editar aqui altera toda a vitrine.
  */
@@ -144,6 +145,48 @@ export const PRODUCTS: Product[] = [
   c("Senegal",   "🇸🇳", "africa", "ouro",  82, "#00853F", "#FDEF42", "#E31B23", "Os Leões da Teranga chegam fortes."),
   c("Costa do Marfim","🇨🇮","africa", "prata", 79, "#FF8200", "#FFFFFF", "#009E60", "Os Elefantes campeões africanos voltam à elite."),
   c("Gana",      "🇬🇭", "africa", "prata", 78, "#FCD116", "#006B3F", "#CE1126", "Black Stars com nova geração de craques."),
+  c("Tunisia",   "🇹🇳", "africa", "prata", 77, "#E70013", "#FFFFFF", "#000000", "As Águias de Cartago de volta à festa mundial."),
+  c("Argelia",   "🇩🇿", "africa", "prata", 78, "#006233", "#FFFFFF", "#D21034", "Raposas do Deserto retornam após eliminação dolorosa."),
+  c("Camaroes",  "🇨🇲", "africa", "prata", 78, "#007A5E", "#CE1126", "#FCD116", "Leões Indomáveis: tradição em todas as Copas."),
+  c("Nigeria",   "🇳🇬", "africa", "ouro",  82, "#008751", "#FFFFFF", "#000000", "Super Eagles. A camisa mais cobiçada da África."),
+  c("Africa do Sul","🇿🇦","africa", "prata", 76, "#007749", "#FFB81C", "#000000", "Bafana Bafana volta à Copa após anos."),
+  c("Mali",      "🇲🇱", "africa", "prata", 76, "#FCD116", "#14B53A", "#CE1126", "Geração de ouro chega à primeira Copa."),
+
+  // ==================== CURRENT — América do Norte / Central ====================
+  c("Canada",    "🇨🇦", "america-norte", "prata", 80, "#FF0000", "#FFFFFF", "#000000", "Co-anfitriões. A geração Davies/David em casa."),
+  c("Costa Rica","🇨🇷", "america-norte", "prata", 76, "#CE1126", "#FFFFFF", "#002B7F", "Los Ticos: sempre uma surpresa em Copas."),
+  c("Jamaica",   "🇯🇲", "america-norte", "prata", 75, "#009B3A", "#FED100", "#000000", "Reggae Boyz inspiram pelo seu retorno."),
+  c("Panama",    "🇵🇦", "america-norte", "prata", 75, "#005AA7", "#FFFFFF", "#D21034", "La Marea Roja na segunda Copa do Mundo."),
+  c("Honduras",  "🇭🇳", "america-norte", "prata", 75, "#0073CF", "#FFFFFF", "#FFFFFF", "Los Catrachos cravam vaga inédita."),
+
+  // ==================== CURRENT — América do Sul (extras) ====================
+  c("Chile",     "🇨🇱", "america-sul", "prata", 79, "#D52B1E", "#FFFFFF", "#0039A6", "La Roja chilena volta em ciclo renovado."),
+  c("Peru",      "🇵🇪", "america-sul", "prata", 77, "#FFFFFF", "#D91023", "#FFD700", "La Blanquirroja: garra e tradição andina."),
+  c("Bolivia",   "🇧🇴", "america-sul", "prata", 75, "#007A33", "#FFD700", "#D52B1E", "La Verde joga em altitude e quer surpreender."),
+  c("Venezuela", "🇻🇪", "america-sul", "prata", 76, "#7B1113", "#FFD100", "#003893", "La Vinotinto na primeira Copa da história."),
+
+  // ==================== CURRENT — Europa (extras) ====================
+  c("Italia",    "🇮🇹", "europa", "epico", 89, "#0066CC", "#FFFFFF", "#FFD700", "Azzurra de volta após dois fora. Hora da redenção."),
+  c("Dinamarca", "🇩🇰", "europa", "ouro",  84, "#C60C30", "#FFFFFF", "#000000", "Os Dynamite Reds com talento europeu."),
+  c("Polonia",   "🇵🇱", "europa", "ouro",  82, "#FFFFFF", "#DC143C", "#000000", "Lewandowski lidera os Bialo-Czerwoni."),
+  c("Ucrania",   "🇺🇦", "europa", "ouro",  82, "#FFD500", "#0057B7", "#000000", "A Zhovto-Sini joga por mais que três pontos."),
+  c("Servia",    "🇷🇸", "europa", "ouro",  83, "#C6363C", "#FFFFFF", "#0C4076", "Os Orlovi com uma das gerações mais ofensivas."),
+  c("Hungria",   "🇭🇺", "europa", "prata", 80, "#CE2939", "#FFFFFF", "#477050", "A Mighty Magyars de volta à elite mundial."),
+  c("Romenia",   "🇷🇴", "europa", "prata", 79, "#FCD116", "#002B7F", "#CE1126", "Os Tricolorii regressam após 28 anos."),
+  c("Pais de Gales","🏴","europa", "prata", 79, "#D30731", "#FFFFFF", "#006233", "Os Dragões querem repetir o épico de 2022."),
+  c("Republica Tcheca","🇨🇿","europa","prata", 78, "#D7141A", "#FFFFFF", "#11457E", "Os Národní Tým com base sólida e veterana."),
+
+  // ==================== CURRENT — Ásia (extras) ====================
+  c("Iran",      "🇮🇷", "asia", "ouro",  82, "#FFFFFF", "#239F40", "#DA0000", "Team Melli: maior potência do continente."),
+  c("Arabia Saudita","🇸🇦","asia", "prata", 78, "#FFFFFF", "#006C35", "#000000", "Os Falcões Verdes que humilharam a Argentina em 2022."),
+  c("Australia", "🇦🇺", "asia", "ouro",  81, "#FFD200", "#00843D", "#000000", "Socceroos firmes na sua sexta Copa seguida."),
+  c("Catar",     "🇶🇦", "asia", "prata", 77, "#8A1538", "#FFFFFF", "#FFFFFF", "O atual campeão da Ásia volta como visitante."),
+  c("Iraque",    "🇮🇶", "asia", "prata", 76, "#FFFFFF", "#007A3D", "#CE1126", "Os Leões da Mesopotâmia em uma Copa histórica."),
+  c("Uzbequistao","🇺🇿","asia", "prata", 76, "#FFFFFF", "#1EB53A", "#0099B5", "Lobos Brancos estreantes no maior palco."),
+
+  // ==================== CURRENT — Oceania ====================
+  c("Nova Zelandia","🇳🇿","asia", "prata", 75, "#FFFFFF", "#000000", "#CE1126", "All Whites garantiram vaga direta da Oceania."),
+
 
   // ==================== LEGENDARY ====================
   l("Brasil",    "🇧🇷", "america-sul", "lendario", 1994, "home", 95, "#FFDF00", "#009C3B", "#002776", "Tetracampeã. Romário & Bebeto eternos."),

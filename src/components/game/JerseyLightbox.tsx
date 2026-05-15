@@ -9,6 +9,8 @@ export interface LightboxShot {
   label: string;
   number: number;
   useVariant: Variant;
+  /** Real photo URL (Shopify CDN). When present, renders <img> instead of the SVG fallback. */
+  image?: string;
 }
 
 interface Props {
@@ -161,12 +163,22 @@ export function JerseyLightbox({
           className="absolute inset-0 grid place-items-center transition-transform duration-200 ease-out"
           style={{ transform: `translate(${pan.x}px, ${pan.y}px) scale(${zoom})` }}
         >
-          <Jersey
-            key={shot.key + shot.useVariant}
-            primary={primary} secondary={secondary} accent={accent}
-            variant={shot.useVariant} number={shot.number}
-            className="h-[70vh] max-h-[70vh] w-auto drop-shadow-[0_25px_40px_rgba(0,0,0,0.7)]"
-          />
+          {shot.image ? (
+            <img
+              key={shot.key}
+              src={shot.image}
+              alt={`${team} — ${shot.label}`}
+              draggable={false}
+              className="h-[70vh] max-h-[70vh] w-auto object-contain drop-shadow-[0_25px_40px_rgba(0,0,0,0.5)]"
+            />
+          ) : (
+            <Jersey
+              key={shot.key + shot.useVariant}
+              primary={primary} secondary={secondary} accent={accent}
+              variant={shot.useVariant} number={shot.number}
+              className="h-[70vh] max-h-[70vh] w-auto drop-shadow-[0_25px_40px_rgba(0,0,0,0.7)]"
+            />
+          )}
         </div>
 
         {/* Arrows */}
@@ -203,7 +215,11 @@ export function JerseyLightbox({
             >
               <div className="absolute inset-0 bg-grid opacity-20" />
               <div className="relative grid h-full place-items-center">
-                <Jersey primary={primary} secondary={secondary} accent={accent} variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                {g.image ? (
+                  <img src={g.image} alt={g.label} loading="lazy" decoding="async" className="h-full w-full object-contain p-1" />
+                ) : (
+                  <Jersey primary={primary} secondary={secondary} accent={accent} variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                )}
               </div>
               <span className="absolute inset-x-0 bottom-0 bg-background/70 py-0.5 text-center font-tactical text-[8px] font-bold uppercase tracking-widest">
                 {g.label}
