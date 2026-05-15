@@ -153,3 +153,27 @@ collection handle directly.
 - [ ] Verify `/colecoes` and a PDP load real Shopify data.
 - [ ] Remove `src/data/products.ts` from production reads (keep as type/seed
       reference only).
+
+---
+
+## Imagens reais (galeria do PDP)
+
+Imagens **não** vivem em metafields — são `Media` nativos do produto Shopify.
+A Storefront API expõe via `product.images(first:N)` e o adapter
+(`src/lib/shopify.ts`) já as mapeia para `Product.images: string[]` (URLs CDN).
+
+Convenção de ordem (a galeria mostra na mesma ordem em que estão no Shopify):
+
+| Posição | Conteúdo recomendado |
+|---------|----------------------|
+| 1       | Frente (mandante) — usada como `featuredImage` e capa OG |
+| 2       | Costas com nome/número |
+| 3       | Visitante (II) ou detalhe macro |
+| 4       | Patch/etiqueta de raridade |
+
+O frontend faz fallback automático para o `<Jersey />` SVG quando o produto
+ainda não tem fotos, então é seguro popular o catálogo antes do shooting.
+
+Para semear imagens em massa via Admin API, use o helper `attachImages` em
+`scripts/seed-shopify.mjs` (cada seed aceita `images: string[]`). O Shopify
+faz o fetch das URLs e re-hospeda no CDN dele.
