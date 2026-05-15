@@ -96,6 +96,15 @@ async function ensureDefinitions() {
 
 /* ============================ Seed products ============================ */
 
+/**
+ * Each seed can carry an `images: string[]` of public HTTPS URLs that Shopify
+ * will fetch and host on its CDN. They become available immediately via the
+ * Storefront API (`product.images`) consumed by the frontend gallery.
+ *
+ * Tip: hosting the originals in your own bucket (S3, R2, Cloudinary) gives you
+ * the most stable seeding. The strings below are placeholders — replace them
+ * with the real product photography you upload.
+ */
 const SEEDS = [
   {
     handle: "selecao-brasil-2026",
@@ -104,6 +113,12 @@ const SEEDS = [
     productType: "Camisa de Seleção",
     tags: ["copa-2026", "current", "drop-oficial"],
     price: "329.00",
+    images: [
+      "https://cdn.example.com/patchclub/brasil-2026/front.jpg",
+      "https://cdn.example.com/patchclub/brasil-2026/back.jpg",
+      "https://cdn.example.com/patchclub/brasil-2026/away.jpg",
+      "https://cdn.example.com/patchclub/brasil-2026/patch.jpg",
+    ],
     metafields: {
       rarity: "lendario",
       ovr: 94,
@@ -123,6 +138,12 @@ const SEEDS = [
     productType: "Camisa Lendária",
     tags: ["legendary", "campea-mundial"],
     price: "449.00",
+    images: [
+      "https://cdn.example.com/patchclub/argentina-2022/front.jpg",
+      "https://cdn.example.com/patchclub/argentina-2022/back.jpg",
+      "https://cdn.example.com/patchclub/argentina-2022/detail.jpg",
+      "https://cdn.example.com/patchclub/argentina-2022/patch.jpg",
+    ],
     metafields: {
       rarity: "lendario",
       ovr: 99,
@@ -142,6 +163,12 @@ const SEEDS = [
     productType: "Camisa Lendária",
     tags: ["legendary", "retro-90s"],
     price: "369.00",
+    images: [
+      "https://cdn.example.com/patchclub/franca-1998/front.jpg",
+      "https://cdn.example.com/patchclub/franca-1998/back.jpg",
+      "https://cdn.example.com/patchclub/franca-1998/detail.jpg",
+      "https://cdn.example.com/patchclub/franca-1998/patch.jpg",
+    ],
     metafields: {
       rarity: "epico",
       ovr: 92,
@@ -152,6 +179,56 @@ const SEEDS = [
       year: 1998,
       type: "legendary",
       colors: { primary: "#0055A4", secondary: "#FFFFFF", accent: "#EF4135" },
+    },
+  },
+  {
+    handle: "selecao-marrocos-2026",
+    title: "Marrocos 2026",
+    descriptionHtml: "<p>Camisa oficial dos Leões do Atlas. Edição Copa 2026.</p>",
+    productType: "Camisa de Seleção",
+    tags: ["copa-2026", "current"],
+    price: "299.00",
+    images: [
+      "https://cdn.example.com/patchclub/marrocos-2026/front.jpg",
+      "https://cdn.example.com/patchclub/marrocos-2026/back.jpg",
+      "https://cdn.example.com/patchclub/marrocos-2026/away.jpg",
+      "https://cdn.example.com/patchclub/marrocos-2026/patch.jpg",
+    ],
+    metafields: {
+      rarity: "ouro",
+      ovr: 84,
+      stats: { ata: 82, tec: 85, mist: 86, hist: 80 },
+      continent: "africa",
+      team: "Marrocos",
+      flag: "🇲🇦",
+      year: 2026,
+      type: "current",
+      colors: { primary: "#C1272D", secondary: "#006233", accent: "#FFFFFF" },
+    },
+  },
+  {
+    handle: "selecao-japao-2026",
+    title: "Japão 2026",
+    descriptionHtml: "<p>Os Samurais Azuis em sua edição mais ousada.</p>",
+    productType: "Camisa de Seleção",
+    tags: ["copa-2026", "current"],
+    price: "299.00",
+    images: [
+      "https://cdn.example.com/patchclub/japao-2026/front.jpg",
+      "https://cdn.example.com/patchclub/japao-2026/back.jpg",
+      "https://cdn.example.com/patchclub/japao-2026/away.jpg",
+      "https://cdn.example.com/patchclub/japao-2026/patch.jpg",
+    ],
+    metafields: {
+      rarity: "ouro",
+      ovr: 83,
+      stats: { ata: 80, tec: 86, mist: 84, hist: 78 },
+      continent: "asia",
+      team: "Japão",
+      flag: "🇯🇵",
+      year: 2026,
+      type: "current",
+      colors: { primary: "#0033A0", secondary: "#FFFFFF", accent: "#BC002D" },
     },
   },
 ];
