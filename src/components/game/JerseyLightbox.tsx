@@ -215,7 +215,11 @@ export function JerseyLightbox({
             >
               <div className="absolute inset-0 bg-grid opacity-20" />
               <div className="relative grid h-full place-items-center">
-                <Jersey primary={primary} secondary={secondary} accent={accent} variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                {g.image ? (
+                  <img src={g.image} alt={g.label} loading="lazy" decoding="async" className="h-full w-full object-contain p-1" />
+                ) : (
+                  <Jersey primary={primary} secondary={secondary} accent={accent} variant={g.useVariant} number={g.number} className="h-3/4 w-auto" />
+                )}
               </div>
               <span className="absolute inset-x-0 bottom-0 bg-background/70 py-0.5 text-center font-tactical text-[8px] font-bold uppercase tracking-widest">
                 {g.label}
